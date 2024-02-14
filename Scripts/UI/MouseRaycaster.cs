@@ -30,7 +30,7 @@ public partial class MouseRaycaster : Marker3D
 			if (result.Count > 0 && result["collider"].Obj is CharacterBody3D body)
 			{
 				var creature = Utils.GetFirstParentOfType<Creature>(body);
-				//visualizer.SetBrainInstance(creature.GetBrain());
+				visualizer.SetBrainInstance(creature.GetBrain());
 				gameManager.SetSelectedCreature(creature);
 			}
 		}

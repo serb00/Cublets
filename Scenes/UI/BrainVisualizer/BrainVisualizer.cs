@@ -37,23 +37,16 @@ public partial class BrainVisualizer : Panel
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		// Create a default Brain
-		BrainInstance = new Brain(40, 8, 8, 4, 8, 1);
-
-
-		neuronNodes = new List<TextureRect>(BrainInstance.NeuronsCount());
-		connectionNodes = new List<TextureRect>(BrainInstance.ConnectionsCount());
-
 		panelWidth = 558;
 		panelHeight = 720;
 		Margin = panelWidth / 10;
-
-		CreateGraph();
 	}
 
 	private void ClearGraph()
 	{
+		neuronNodes ??= new List<TextureRect>();
 		neuronNodes.Clear();
+		connectionNodes ??= new List<TextureRect>();
 		connectionNodes.Clear();
 		foreach (var child in GetChildren())
 		{
@@ -99,12 +92,14 @@ public partial class BrainVisualizer : Panel
 	{
 		base._Process(delta);
 		// Update the Brain every 0.5 seconds
-		timeSinceLastUpdate += delta;
-		if (timeSinceLastUpdate > 0.5f)
+		if (BrainInstance is not null)
 		{
-			BrainInstance.UpdateBrain();
-			UpdateGraph();
-			timeSinceLastUpdate = 0f;
+			timeSinceLastUpdate += delta;
+			if (timeSinceLastUpdate > 0.5f)
+			{
+				UpdateGraph();
+				timeSinceLastUpdate = 0f;
+			}
 		}
 	}
 
