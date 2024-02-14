@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bte3g87dpvoxe"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_0k3ws"]
+
+[node name="Neuron" type="TextureRect"]
+anchors_preset = -1
+offset_right = 20.0
+offset_bottom = 20.0
+size_flags_horizontal = 4
+size_flags_vertical = 6
+texture = SubResource("CanvasTexture_0k3ws")

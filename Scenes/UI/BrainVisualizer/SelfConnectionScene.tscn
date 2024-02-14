@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://dxuy1p10df5e6"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_ry1gc"]
+
+[node name="TextureRect" type="TextureRect"]
+modulate = Color(1, 0, 1, 0.639216)
+offset_right = 10.0
+offset_bottom = 10.0
+texture = SubResource("CanvasTexture_ry1gc")

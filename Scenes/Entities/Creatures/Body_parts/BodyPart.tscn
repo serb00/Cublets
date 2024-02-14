@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://cf64a0fqqdp4h"]
+
+[ext_resource type="Script" path="res://Scenes/Entities/Creatures/Body_parts/BodyPart.cs" id="1_a8cv7"]
+[ext_resource type="PackedScene" uid="uid://bhl07s2ecbcd6" path="res://Scenes/Entities/Creatures/Body_parts/Eye/Eye.tscn" id="2_8n1gi"]
+
+[node name="BodyPart" type="Node3D"]
+script = ExtResource("1_a8cv7")
+packedScene = ExtResource("2_8n1gi")

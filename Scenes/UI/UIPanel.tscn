@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3 uid="uid://cbvbjvgm0e03i"]
+
+[ext_resource type="Script" path="res://Scripts/UI/BrainVisualizer.cs" id="1_4dvfm"]
+[ext_resource type="Script" path="res://Scenes/UI/UIPanel.cs" id="1_pbkeq"]
+[ext_resource type="PackedScene" uid="uid://bte3g87dpvoxe" path="res://Scenes/UI/BrainVisualizer/NeuronScene.tscn" id="3_t0bwu"]
+[ext_resource type="PackedScene" uid="uid://e2lh3qgr4xci" path="res://Scenes/UI/BrainVisualizer/ConnectionScene.tscn" id="4_0vc38"]
+[ext_resource type="PackedScene" uid="uid://dxuy1p10df5e6" path="res://Scenes/UI/BrainVisualizer/SelfConnectionScene.tscn" id="5_3nrk4"]
+
+[node name="Panel" type="Panel"]
+offset_right = 558.0
+offset_bottom = 810.0
+script = ExtResource("1_pbkeq")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Selected creature:"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("1_4dvfm")
+NeuronScene = ExtResource("3_t0bwu")
+ConnectionScene = ExtResource("4_0vc38")
+SelfConnectionScene = ExtResource("5_3nrk4")
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Totals:"

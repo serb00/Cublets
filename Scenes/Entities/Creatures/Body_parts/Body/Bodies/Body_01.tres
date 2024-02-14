@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BodyData" load_steps=3 format=3 uid="uid://dhbkakrbi5s00"]
+
+[ext_resource type="PackedScene" uid="uid://cutd0vvgy0ihy" path="res://addons/kaykit_prototype_bits/Assets/gltf/Cube_Prototype_Small.gltf" id="1_mgx8k"]
+[ext_resource type="Script" path="res://Database/BodyData.cs" id="2_nu3sq"]
+
+[resource]
+script = ExtResource("2_nu3sq")
+Name = "Cubic"
+Scene = ExtResource("1_mgx8k")
+Size = 1.0

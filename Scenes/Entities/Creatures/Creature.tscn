@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://bupummhvg87px"]
+
+[ext_resource type="Script" path="res://Scenes/Entities/Creatures/Creature.cs" id="1_3hcvp"]
+[ext_resource type="PackedScene" uid="uid://cmnwx87a6vxtt" path="res://Scenes/Entities/Creatures/Body_parts/Body/Body.tscn" id="2_gj0qp"]
+
+[node name="Creature" type="CharacterBody3D" node_paths=PackedStringArray("ParentForBodyParts") groups=["Creature"]]
+collision_layer = 2
+script = ExtResource("1_3hcvp")
+ParentForBodyParts = NodePath("BodyParts")
+_bodyScene = ExtResource("2_gj0qp")
+
+[node name="BodyParts" type="Node3D" parent="."]

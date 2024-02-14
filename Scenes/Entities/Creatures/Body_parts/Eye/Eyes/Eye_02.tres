@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EyeData" load_steps=3 format=3 uid="uid://6lgm6luhvqic"]
+
+[ext_resource type="PackedScene" uid="uid://d14pnm6o6j33i" path="res://addons/kaykit_prototype_bits/Assets/gltf/Coin_A.gltf" id="1_08opd"]
+[ext_resource type="Script" path="res://Database/EyeData.cs" id="1_wkapq"]
+
+[resource]
+script = ExtResource("1_wkapq")
+Name = "Eye_002"
+Scene = ExtResource("1_08opd")
+ViewDistance = 20.0
+FOVHorizontal = 20.0
+FOVVertical = 180.0
+Scale = Vector3(0.3, 0.3, 0.3)
+UpdateIntervalSeconds = 1.0

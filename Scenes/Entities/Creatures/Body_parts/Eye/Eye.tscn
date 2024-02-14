@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bhl07s2ecbcd6"]
+
+[ext_resource type="Script" path="res://Scenes/Entities/Creatures/Body_parts/Eye/Eye.cs" id="1_m80oi"]
+[ext_resource type="Resource" uid="uid://ca8u7jgim5o7y" path="res://Scenes/Entities/Creatures/Body_parts/Eye/Eyes/Eye_01.tres" id="2_6c2of"]
+
+[node name="Eye" type="Node3D"]
+script = ExtResource("1_m80oi")
+_eyeData = ExtResource("2_6c2of")
+Angle = Vector3(2.08165e-12, 2.08165e-12, 2.08165e-12)

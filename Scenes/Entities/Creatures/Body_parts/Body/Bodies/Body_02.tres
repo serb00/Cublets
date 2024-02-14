@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BodyData" load_steps=3 format=3 uid="uid://1swbmdptlgmc"]
+
+[ext_resource type="Script" path="res://Database/BodyData.cs" id="1_jj4q3"]
+[ext_resource type="PackedScene" uid="uid://dw1lc7urqbk6k" path="res://art/player.glb" id="1_yfujj"]
+
+[resource]
+script = ExtResource("1_jj4q3")
+Name = "Wide"
+Scene = ExtResource("1_yfujj")
+Size = 2.0

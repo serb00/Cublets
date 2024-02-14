@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://e2lh3qgr4xci"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_0k3ws"]
+
+[node name="Connection" type="TextureRect"]
+offset_right = 4.0
+offset_bottom = 4.0
+texture = SubResource("CanvasTexture_0k3ws")

@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cqrrhjqer6saw"]
+
+[ext_resource type="Script" path="res://Scenes/Entities/Creatures/Body_parts/Mouth/Mouth.cs" id="1_sr2pm"]
+[ext_resource type="Resource" uid="uid://0jyypsmlj71" path="res://Scenes/Entities/Creatures/Body_parts/Mouth/Mouths/Mouth_001.tres" id="2_fgyrm"]
+
+[node name="Mouth" type="Node3D"]
+script = ExtResource("1_sr2pm")
+_mouthData = ExtResource("2_fgyrm")
+Type = 1
