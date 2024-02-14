@@ -1,17 +1,29 @@
 using System.Collections.Generic;
 using Godot;
 
+/// <summary>
+/// Represents a neural network that consists of neurons and connections between them.
+/// </summary>
 public class NeuralNetwork
 {
 
     #region Attributes
+    /// <summary>
+    /// Stores the list of neurons in the neural network.
+    /// </summary>
     public List<Neuron> Neurons { get; private set; }
+    /// <summary>
+    /// Stores the number of connections for all neurons in the neural network.
+    /// </summary>
     public int NeuronConnections { get; private set; }
+    /// <summary>
+    /// Stores the number of signal passes in the neural network per network update.
+    /// </summary>
     public int SignalPasses { get; private set; }
 
     #endregion Attributes
 
-    #region Constructors
+    #region Initialization
 
     public NeuralNetwork(int numNeurons, int minConnections, int maxConnections, int signalPasses)
     {
@@ -21,8 +33,6 @@ public class NeuralNetwork
         InitializeNetwork(numNeurons, minConnections, maxConnections);
     }
 
-    #endregion Constructors
-
     private void InitializeNetwork(int numNeurons, int minConnections, int maxConnections)
     {
         // Create Neurons
@@ -31,7 +41,16 @@ public class NeuralNetwork
             Neurons.Add(new Neuron(i));
         }
 
-        // Create Random Connections
+        CreateRandomConnections(minConnections, maxConnections);
+    }
+
+    /// <summary>
+    /// Creates random connections between neurons in the neural network.
+    /// </summary>
+    /// <param name="minConnections">The minimum number of connections for each neuron.</param>
+    /// <param name="maxConnections">The maximum number of connections for each neuron.</param>
+    private void CreateRandomConnections(int minConnections, int maxConnections)
+    {
         foreach (var neuron in Neurons)
         {
             int numConnections = GD.RandRange(minConnections, maxConnections);
@@ -45,6 +64,13 @@ public class NeuralNetwork
         }
     }
 
+    #endregion Initialization
+
+    #region Logic
+
+    /// <summary>
+    /// Updates the neural network by performing the specified number of signal passes.
+    /// </summary>
     public void UpdateNetwork()
     {
         for (int i = 0; i < SignalPasses; i++)
@@ -56,13 +82,25 @@ public class NeuralNetwork
         }
     }
 
+    #endregion Logic
+
     #region NeuronHelpers
 
+    /// <summary>
+    /// Retrieves the value of a neuron in the neural network.
+    /// </summary>
+    /// <param name="neuronID">The ID of the neuron to retrieve the value from.</param>
+    /// <returns>The value of the specified neuron.</returns>
     public float GetNeuronValue(int neuronID)
     {
         return Neurons[neuronID].OutputValue;
     }
 
+    /// <summary>
+    /// Sets the value of a neuron in the neural network.
+    /// </summary>
+    /// <param name="neuronIndex">The index of the neuron.</param>
+    /// <param name="val">The value to set.</param>
     public void SetNeuronValue(int neuronIndex, float val)
     {
         Neurons[neuronIndex].SetValue(val);
