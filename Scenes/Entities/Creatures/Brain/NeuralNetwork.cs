@@ -44,7 +44,26 @@ public class NeuralNetwork
         }
 
         // CreateRandomConnections(minConnections, maxConnections);
-        CreateFullForwardConnections(neuronsMap);
+        //CreateFullForwardConnections(neuronsMap);
+        CreatePartialForwardConnections(neuronsMap);
+    }
+
+    private void CreatePartialForwardConnections(List<NeuronsMapItem> neuronsMap)
+    {
+        int maxLayer = neuronsMap.Max(x => x.Layer);
+        for (int currentLayer = 0; currentLayer <= maxLayer; currentLayer++)
+        {
+            neuronsMap.FindAll(x => x.Layer == currentLayer).ForEach(toNeuron =>
+            {
+                int neuronsOnLevel = neuronsMap.FindAll(x => x.Layer == currentLayer + 1).Count;
+                var selectedNeurons = neuronsMap.FindAll(x => x.Layer == currentLayer + 1).Take(GD.RandRange(1, neuronsOnLevel));
+                foreach (var fromNeuron in selectedNeurons)
+                {
+                    Neurons[toNeuron.ID].Connections.Add(new Connection(Neurons[fromNeuron.ID], Neurons[toNeuron.ID], (float)GD.RandRange(-1f, 1f)));
+                    NeuronConnections++;
+                }
+            });
+        }
     }
 
     private void CreateFullForwardConnections(List<NeuronsMapItem> neuronsMap)

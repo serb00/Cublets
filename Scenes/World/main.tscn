@@ -43,6 +43,9 @@ parentFood = NodePath("Foods")
 parentCreatures = NodePath("Creatures")
 _creatureScene = ExtResource("4_d7aw4")
 
+[node name="GameManager" parent="." instance=ExtResource("12_i68q3")]
+process_mode = 3
+
 [node name="Level" type="Node" parent="."]
 
 [node name="Ground" type="StaticBody3D" parent="Level"]
@@ -100,8 +103,8 @@ mesh = SubResource("BoxMesh_70ysy")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.08165e-12)
 shape = SubResource("BoxShape3D_w7i2v")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, -6.97574e-16, -1.5246e-23, -1.5246e-23, -4.37114e-08, 1, -6.97574e-16, -1, -4.37114e-08, 0, 2.60126, 0)
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Level"]
+transform = Transform3D(1, -6.97574e-16, -1.52459e-23, -1.5246e-23, -4.37114e-08, 1, -6.97574e-16, -1, -4.37114e-08, 0, 2.60126, 0)
 shadow_enabled = true
 
 [node name="CameraPivotAndRaycaster" type="Marker3D" parent="." node_paths=PackedStringArray("_camera", "visualizer", "gameManager")]
@@ -191,12 +194,5 @@ layout_mode = 2
 layout_mode = 2
 text = "Totals:"
 
-[node name="Timer" type="Timer" parent="."]
-one_shot = true
-
-[node name="GameManager" parent="." instance=ExtResource("12_i68q3")]
-process_mode = 3
-
 [connection signal="timeout" from="Foods/FoodTimer" to="." method="OnFoodTimerTimeout"]
 [connection signal="timeout" from="Creatures/CreatureTimer" to="." method="OnCreatureTimerTimeout"]
-[connection signal="timeout" from="Timer" to="." method="OnSingleCreatureTimerTimeout"]
