@@ -27,15 +27,15 @@ public class NeuralNetwork
 
     #region Initialization
 
-    public NeuralNetwork(List<NeuronsMapItem> neuronsMap, int minConnections, int maxConnections, int signalPasses)
+    public NeuralNetwork(List<NeuronsMapItem> neuronsMap, int signalPasses)
     {
         Neurons = new List<Neuron>();
         SignalPasses = signalPasses;
         NeuronConnections = 0;
-        InitializeNetwork(neuronsMap, minConnections, maxConnections);
+        InitializeNetwork(neuronsMap);
     }
 
-    private void InitializeNetwork(List<NeuronsMapItem> neuronsMap, int minConnections, int maxConnections)
+    private void InitializeNetwork(List<NeuronsMapItem> neuronsMap)
     {
         // Create Neurons
         foreach (var neuron in neuronsMap)

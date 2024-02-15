@@ -36,11 +36,7 @@ public class Brain
         lastIndex = MapHiddenNeurons(NumHiddenNeurons, lastIndex);
         MapOutputNeurons(outputNeuronsList, brainHiddenLayers + 1, lastIndex);
 
-
-        int minConnections = GD.RandRange(1, 1);
-        int maxConnections = GD.RandRange(minConnections, 2);
-
-        NeuralNetwork = new NeuralNetwork(NeuronsMap, minConnections, maxConnections, signalPasses);
+        NeuralNetwork = new NeuralNetwork(NeuronsMap, signalPasses);
         outputMappings = new();
         InitializeMappings();
     }
