@@ -77,18 +77,18 @@ public partial class Player : CharacterBody3D
             // If the collision is with a mob.
             // With C# we leverage typing and pattern-matching
             // instead of checking for the group we created.
-            if (collision.GetCollider() is Mob mob)
-            {
-                // We check that we are hitting it from above.
-                if (Vector3.Up.Dot(collision.GetNormal()) > 0.1f)
-                {
-                    // If so, we squash it and bounce.
-                    mob.Squash();
-                    _targetVelocity.Y = BounceImpulse;
-                    // Prevent further duplicate calls.
-                    break;
-                }
-            }
+            // if (collision.GetCollider() is Mob mob)
+            // {
+            //     // We check that we are hitting it from above.
+            //     if (Vector3.Up.Dot(collision.GetNormal()) > 0.1f)
+            //     {
+            //         // If so, we squash it and bounce.
+            //         mob.Squash();
+            //         _targetVelocity.Y = BounceImpulse;
+            //         // Prevent further duplicate calls.
+            //         break;
+            //     }
+            // }
         }
 
         // Moving the character

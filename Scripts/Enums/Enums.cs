@@ -122,3 +122,12 @@ public enum NeuronActivationFunction
     Sign
 
 }
+
+public enum BrainZoneType
+{
+    Visual,
+    Audial,
+    Movement,
+    Consumption,
+    Internal
+}

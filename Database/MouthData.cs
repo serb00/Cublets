@@ -19,5 +19,6 @@ public partial class MouthData : Resource
 	[Export] public Vector3 Scale { get; set; }
 	[ExportCategory("Area Category")]
 	[Export] public Vector3 Size { get; set; }
+	[Export] public int OutputNeurons { get; set; }
 
 }

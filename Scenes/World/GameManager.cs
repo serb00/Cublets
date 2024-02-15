@@ -97,7 +97,7 @@ public partial class GameManager : Node
 		}
 		if (Input.IsActionJustPressed("Action3"))
 		{
-
+			_main.CreateFood();
 		}
 		if (Input.IsActionJustPressed("Action4"))
 		{

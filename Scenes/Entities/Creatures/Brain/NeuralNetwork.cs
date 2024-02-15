@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 /// <summary>
@@ -25,23 +27,42 @@ public class NeuralNetwork
 
     #region Initialization
 
-    public NeuralNetwork(int numNeurons, int minConnections, int maxConnections, int signalPasses)
+    public NeuralNetwork(List<NeuronsMapItem> neuronsMap, int minConnections, int maxConnections, int signalPasses)
     {
         Neurons = new List<Neuron>();
         SignalPasses = signalPasses;
         NeuronConnections = 0;
-        InitializeNetwork(numNeurons, minConnections, maxConnections);
+        InitializeNetwork(neuronsMap, minConnections, maxConnections);
     }
 
-    private void InitializeNetwork(int numNeurons, int minConnections, int maxConnections)
+    private void InitializeNetwork(List<NeuronsMapItem> neuronsMap, int minConnections, int maxConnections)
     {
         // Create Neurons
-        for (int i = 0; i < numNeurons; i++)
+        foreach (var neuron in neuronsMap)
         {
-            Neurons.Add(new Neuron(i));
+            Neurons.Add(new Neuron(neuron.ID, neuron.ActivationFunction));
         }
 
-        CreateRandomConnections(minConnections, maxConnections);
+        // CreateRandomConnections(minConnections, maxConnections);
+        CreateFullForwardConnections(neuronsMap);
+    }
+
+    private void CreateFullForwardConnections(List<NeuronsMapItem> neuronsMap)
+    {
+        int maxLayer = neuronsMap.Max(x => x.Layer);
+
+        for (int currentLayer = 1; currentLayer <= maxLayer; currentLayer++)
+        {
+            neuronsMap.FindAll(x => x.Layer == currentLayer).ForEach(toNeuron =>
+            {
+                neuronsMap.FindAll(x => x.Layer == currentLayer - 1).ForEach(fromNeuron =>
+                {
+                    Neurons[fromNeuron.ID].Connections.Add(new Connection(Neurons[fromNeuron.ID], Neurons[toNeuron.ID], (float)GD.RandRange(-1f, 1f)));
+                    NeuronConnections++;
+                });
+            });
+        }
+
     }
 
     /// <summary>

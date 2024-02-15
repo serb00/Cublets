@@ -1,31 +1,118 @@
 using Godot;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Brain
 {
 
     #region Attributes
-    private NeuralNetwork neuralNetwork { get; set; }
-    public int numInputNeurons { get; set; }
-    public int numOutputNeurons { get; set; }
+    private NeuralNetwork NeuralNetwork { get; set; }
+    public int NumInputNeurons { get; set; }
+    public int NumOutputNeurons { get; set; }
+    public int NumTotalNeurons { get; set; }
+    public List<NeuronsMapItem> NeuronsMap { get; set; } = new();
 
-    public int numTotalNeurons { get; set; }
-    private Dictionary<int, Sensor> inputMappings;
-    private Dictionary<int, Action> outputMappings;
+    private Dictionary<int, Action> outputMappings = new();
 
     #endregion Attributes
 
     #region Constructors
 
-    public Brain(int totalNeurons, int numInputs, int numOutputs, int minConnections, int maxConnections, int signalPasses)
+    public void Initialize(
+        List<BrainZone> inputNeuronsList,
+        List<BrainZone> outputNeuronsList,
+        int brainHiddenLayers, int signalPasses)
     {
-        numInputNeurons = numInputs;
-        numOutputNeurons = numOutputs;
-        numTotalNeurons = totalNeurons;
-        neuralNetwork = new NeuralNetwork(totalNeurons, minConnections, maxConnections, signalPasses);
-        inputMappings = new Dictionary<int, Sensor>();
-        outputMappings = new Dictionary<int, Action>();
+        NumInputNeurons = inputNeuronsList.Sum(x => x.NeuronsCount);
+        NumOutputNeurons = outputNeuronsList.Sum(x => x.NeuronsCount);
+        int[] NumHiddenNeurons = new int[brainHiddenLayers];
+        for (int i = 0; i < brainHiddenLayers; i++)
+        {
+            NumHiddenNeurons[i] += GD.RandRange(NumInputNeurons, NumInputNeurons + NumOutputNeurons);
+        }
+        NumTotalNeurons = NumInputNeurons + NumOutputNeurons + NumHiddenNeurons.Sum();
+        int lastIndex = MapInputNeurons(inputNeuronsList);
+        lastIndex = MapHiddenNeurons(NumHiddenNeurons, lastIndex);
+        MapOutputNeurons(outputNeuronsList, brainHiddenLayers + 1, lastIndex);
+
+
+        int minConnections = GD.RandRange(1, 1);
+        int maxConnections = GD.RandRange(minConnections, 2);
+
+        NeuralNetwork = new NeuralNetwork(NeuronsMap, minConnections, maxConnections, signalPasses);
+        outputMappings = new();
         InitializeMappings();
+    }
+
+    private void MapOutputNeurons(List<BrainZone> outputNeuronsList, int outputLayerIndex, int idx)
+    {
+        foreach (var item in outputNeuronsList)
+        {
+            // movement neurons
+            if (item.BodyPartLink == null)
+            {
+                NeuronsMap.Add(new NeuronsMapItem(idx++, BrainZoneType.Movement, NeuronActivationFunction.HyperbolicTangent, null, outputLayerIndex));
+                NeuronsMap.Add(new NeuronsMapItem(idx++, BrainZoneType.Movement, NeuronActivationFunction.HyperbolicTangent, null, outputLayerIndex));
+            }
+            else
+            {
+                switch (item.BodyPartLink.Type)
+                {
+                    case BodyPartType.Mouth:
+                        NeuronsMap.Add(new NeuronsMapItem(idx++, BrainZoneType.Movement, NeuronActivationFunction.BinaryStep, item.BodyPartLink, outputLayerIndex));
+                        break;
+                    default:
+                        GD.Print("Unknown body part type in Brain.MapOutputNeurons method");
+                        break;
+                }
+            }
+        }
+    }
+
+    private int MapHiddenNeurons(int[] hiddenLayers, int idx)
+    {
+        int layer = 0;
+        foreach (var neuronsInLayer in hiddenLayers)
+        {
+            layer++;
+            for (int i = 0; i < neuronsInLayer; i++)
+            {
+                NeuronsMap.Add(new NeuronsMapItem(idx++, BrainZoneType.Internal, Utils.GetRandomEnumValue<NeuronActivationFunction>(), null, layer));
+            }
+        }
+        return idx;
+    }
+
+    private int MapInputNeurons(List<BrainZone> inputNeuronsList)
+    {
+        int idx = 0;
+        foreach (var item in inputNeuronsList)
+        {
+            if (item.BodyPartLink != null)
+            {
+                switch (item.BodyPartLink.Type)
+                {
+                    case BodyPartType.Eye:
+                        Eye eye = item.BodyPartLink as Eye;
+                        for (int i = 0; i < eye._eyeData.EyeComplexity; i++)
+                        {
+                            NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.Sigmoid, item.BodyPartLink, 0));
+                            NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.HyperbolicTangent, item.BodyPartLink, 0));
+                            NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.Sigmoid, item.BodyPartLink, 0));
+                        }
+                        break;
+                    case BodyPartType.Mouth:
+                        NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.BinaryStep, item.BodyPartLink, 0));
+                        break;
+                    default:
+                        GD.Print("Unknown body part type in Brain.MapInputNeurons method");
+                        break;
+                }
+            }
+        }
+        // GD.Print($"Input neurons mapped: {idx}. Total input neurons: {NumInputNeurons}");
+        return idx;
     }
 
     #endregion Constructors
@@ -33,11 +120,7 @@ public class Brain
     private void InitializeMappings()
     {
         // Initialize inputMappings and outputMappings
-        for (int i = 0; i < numInputNeurons; i++)
-        {
-            inputMappings[i] = new Sensor(i);
-        }
-        for (int i = 0; i < numOutputNeurons; i++)
+        for (int i = 0; i < NumOutputNeurons; i++)
         {
             outputMappings[i] = new Action(i);
         }
@@ -45,23 +128,16 @@ public class Brain
 
     public void UpdateBrain()
     {
-        // Update input neurons based on sensor data
-        for (int i = 0; i < numInputNeurons; i++)
-        {
-            // TODO: Only update the neuron if the sensor has changed
-            neuralNetwork.SetNeuronValue(i, inputMappings[i].GetValue());
-        }
-
         // Update the neural network
         // TODO: Update only the part of the network which has input neurons
         // that have been changed
-        neuralNetwork.UpdateNetwork();
+        NeuralNetwork.UpdateNetwork();
 
         // Execute actions based on output neurons
-        for (int i = 0; i < numOutputNeurons; i++)
+        for (int i = 0; i < NumOutputNeurons; i++)
         {
-            int outputIndex = neuralNetwork.Neurons.Count - numOutputNeurons + i;
-            outputMappings[i].Execute(neuralNetwork.Neurons[outputIndex].OutputValue);
+            int outputIndex = NeuralNetwork.Neurons.Count - NumOutputNeurons + i;
+            outputMappings[i].Execute(NeuralNetwork.Neurons[outputIndex].OutputValue);
         }
     }
 
@@ -69,29 +145,27 @@ public class Brain
 
     public IEnumerable<Neuron> GetAllNeurons()
     {
-        return neuralNetwork.Neurons;
+        return NeuralNetwork.Neurons;
     }
 
     public int NeuronsCount()
     {
-        return neuralNetwork.Neurons.Count;
+        return NeuralNetwork.Neurons.Count;
     }
 
     public float GetNeuron(int index)
     {
-        float val;
-        val = neuralNetwork.GetNeuronValue(index);
-        return val;
+        return NeuralNetwork.GetNeuronValue(index);
     }
 
-    public void SetNeuronValue(int index, float value)
+    public void SetNeuronValue(int index, float val)
     {
-        neuralNetwork.SetNeuronValue(index, value);
+        NeuralNetwork.SetNeuronValue(index, val);
     }
 
     public int ConnectionsCount()
     {
-        return neuralNetwork.NeuronConnections;
+        return NeuralNetwork.NeuronConnections;
     }
 
     #endregion NeuronHelpers
@@ -118,9 +192,11 @@ public class Sensor
 public class Action
 {
     readonly int ID;
-    public Action(int i)
+    readonly Delegate action;
+    public Action(int i, Delegate delegateAction = null)
     {
         ID = i;
+        action = delegateAction;
     }
     public void Execute(float signal)
     {
@@ -128,7 +204,7 @@ public class Action
         // Example: move a game object, change a state, etc.
         if (signal > 0.7f)
         {
-            //GD.Print($"Action executed by #{ID}");
+            action?.DynamicInvoke();
         }
     }
 }

@@ -17,6 +17,11 @@ public partial class Main : Node
 		OnCreatureTimerTimeout();
 	}
 
+	public void CreateFood()
+	{
+		OnFoodTimerTimeout();
+	}
+
 
 	private void OnCreatureTimerTimeout()
 	{

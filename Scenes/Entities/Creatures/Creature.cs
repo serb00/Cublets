@@ -12,7 +12,7 @@ using System;
 /// </remarks>
 public partial class Creature : CharacterBody3D, IVisible
 {
-    Brain _brain;
+    readonly Brain _brain = new();
     Body _body;
     // [Export] public PackedScene[] _bodyParts;
 
@@ -25,9 +25,9 @@ public partial class Creature : CharacterBody3D, IVisible
 
     [Export] public PackedScene _bodyScene;
 
-    private int brainInputNeurons;
-    private int brainOutputNeurons;
-    private int brainTotalNeurons;
+
+    readonly List<BrainZone> InputNeuronsList = new();
+    readonly List<BrainZone> OutputNeuronsList = new();
 
     public void Initialize(Vector3 position)
     {
@@ -56,18 +56,22 @@ public partial class Creature : CharacterBody3D, IVisible
     private void CreateBodyPartsList()
     {
         int currentNeuronIndex = 0;
-        brainInputNeurons = 0;
-        brainOutputNeurons = 0;
+        int brainInputNeurons = 0;
+        int brainOutputNeurons = 0;
         // Eyes
         PackedScene eyeScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Eye/Eye.tscn"); ;
         EyeData eyeData = (EyeData)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Eye/Eyes/Eye_01.tres");
-        CreateEye(
+        var eye = CreateEye(
             eyeScene,
             eyeData,
             new(0, 0.5f, -1),
             currentNeuronIndex,
             out currentNeuronIndex
         );
+        _bodyParts.Add(eye);
+
+        InputNeuronsList.Add(new BrainZone(BrainZoneType.Visual, currentNeuronIndex - brainInputNeurons, eye));
+        brainInputNeurons = currentNeuronIndex;
 
         // CreateEye(
         //     eyeScene,
@@ -84,64 +88,62 @@ public partial class Creature : CharacterBody3D, IVisible
         //     new(-1, 0.25f, 0),
         //     currentNeuronIndex
         // );
-        brainInputNeurons += currentNeuronIndex;
+
+
+        // Movement
+        OutputNeuronsList.Add(new BrainZone(BrainZoneType.Movement, 2));
         brainOutputNeurons += 2;
 
         // Mouths
         PackedScene mouthScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Mouth/Mouth.tscn");
         MouthData mouthData = (MouthData)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Mouth/Mouths/Mouth_001.tres");
-        CreateMouth(
+        var mouth = CreateMouth(
             mouthScene,
             mouthData,
             new(0, -0.5f, -1),
             currentNeuronIndex,
             out currentNeuronIndex
         );
+        _bodyParts.Add(mouth);
 
-        brainInputNeurons += currentNeuronIndex;
-        brainOutputNeurons += 1;
+        InputNeuronsList.Add(new BrainZone(BrainZoneType.Consumption, currentNeuronIndex - brainInputNeurons, mouth));
+        brainInputNeurons = currentNeuronIndex;
+        OutputNeuronsList.Add(new BrainZone(BrainZoneType.Consumption, mouthData.OutputNeurons, mouth));
+        brainOutputNeurons += mouthData.OutputNeurons;
     }
 
-    private void CreateEye(PackedScene eyeScene, EyeData eyeData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
+    private Eye CreateEye(PackedScene eyeScene, EyeData eyeData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
     {
-        BodyPart eye = eyeScene.Instantiate() as BodyPart;
+        Eye eye = eyeScene.Instantiate() as Eye;
         eye.Name = $"Eye_{eye.GetInstanceId()}";
         eye.Angle = angle;
-        Eye tmp = eye as Eye;
-        tmp._eyeData = eyeData;
-        var neuronsNum = tmp._eyeData.EyeComplexity * tmp._eyeData.ActivatorPerEntity;
-        tmp._neuronInputIndexes = new int[neuronsNum];
+        eye._eyeData = eyeData;
+        var neuronsNum = eye._eyeData.EyeComplexity * eye._eyeData.ActivatorPerEntity;
+        eye._neuronInputIndexes = new int[neuronsNum];
         for (int i = 0; i < neuronsNum; i++)
         {
-            tmp._neuronInputIndexes[i] = currentNeuronIndex++;
+            eye._neuronInputIndexes[i] = currentNeuronIndex++;
         }
         neuronLastIndex = currentNeuronIndex;
-        _bodyParts.Add(eye);
+        return eye;
     }
 
-    private void CreateMouth(PackedScene mouthScene, MouthData mouthData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
+    private Mouth CreateMouth(PackedScene mouthScene, MouthData mouthData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
     {
-        BodyPart mouth = mouthScene.Instantiate() as BodyPart;
+        Mouth mouth = mouthScene.Instantiate() as Mouth;
         mouth.Name = $"Mouth_{mouth.GetInstanceId()}";
         mouth.Angle = angle;
-        Mouth tmp = mouth as Mouth;
-        tmp._mouthData = mouthData;
-        tmp._neuronInputIndexes = new int[1];
-        tmp._neuronInputIndexes[0] = currentNeuronIndex++;
+        mouth._mouthData = mouthData;
+        mouth._neuronInputIndexes = new int[1];
+        mouth._neuronInputIndexes[0] = currentNeuronIndex++;
 
         neuronLastIndex = currentNeuronIndex;
-        _bodyParts.Add(mouth);
+        return mouth;
     }
 
     private void InitializeBrain()
     {
-        int inputNeurons = brainInputNeurons;
-        int outputNeurons = brainOutputNeurons;
-        int totalNeurons = brainInputNeurons + brainOutputNeurons + GD.RandRange(10, 20);
-        int minConnections = GD.RandRange(3, 5);
-        int maxConnections = GD.RandRange(minConnections, 10);
-
-        _brain = new Brain(totalNeurons, inputNeurons, outputNeurons, minConnections, maxConnections, 1);
+        _brain.Initialize(InputNeuronsList, OutputNeuronsList, 7, 1);
     }
 
     public Brain GetBrain()
@@ -261,11 +263,11 @@ public partial class Creature : CharacterBody3D, IVisible
 
     public override void _PhysicsProcess(double delta)
     {
-        var velocityNeuron = _brain.GetNeuron(_brain.numTotalNeurons - brainInputNeurons);
-        var rotationNeuron = _brain.GetNeuron(_brain.numTotalNeurons - brainInputNeurons + 1);
+        var velocityNeuron = _brain.GetNeuron(_brain.NumTotalNeurons - _brain.NumOutputNeurons);
+        var rotationNeuron = _brain.GetNeuron(_brain.NumTotalNeurons - _brain.NumOutputNeurons + 1);
 
         Velocity = Vector3.Forward * velocityNeuron * 20;
-        RotateY(rotationNeuron);
+        RotateY(rotationNeuron / 20);
         Velocity = Velocity.Rotated(Vector3.Up, Rotation.Y);
 
         MoveAndSlide();

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class BrainVisualizer : Panel
 {
@@ -169,11 +170,12 @@ public partial class BrainVisualizer : Panel
 	#region DrawingNeurons
 	private NeuronType DetermineNeuronType(int index)
 	{
-		if (index < BrainInstance.numInputNeurons)
+		var type = BrainInstance.NeuronsMap.Find(x => x.ID == index).Layer;
+		if (index < BrainInstance.NumInputNeurons)
 		{
 			return NeuronType.Input;
 		}
-		else if (index >= BrainInstance.NeuronsCount() - BrainInstance.numOutputNeurons)
+		else if (index >= BrainInstance.NeuronsCount() - BrainInstance.NumOutputNeurons)
 		{
 			return NeuronType.Output;
 		}
@@ -185,29 +187,31 @@ public partial class BrainVisualizer : Panel
 
 	private Vector2 GetNeuronPosition(int index, NeuronType type)
 	{
+
 		float x, y;
-		switch (type)
+		int neuronLayer = BrainInstance.NeuronsMap.Find(x => x.ID == index).Layer;
+		int totalLayers = BrainInstance.NeuronsMap.Max(x => x.Layer);
+		int neuronIndexInLayer = BrainInstance.NeuronsMap.FindAll(x => x.Layer == neuronLayer).IndexOf(BrainInstance.NeuronsMap.Find(x => x.ID == index));
+		int neuronsInLayer = BrainInstance.NeuronsMap.FindAll(x => x.Layer == neuronLayer).Count;
+
+
+		if (neuronLayer == 0)
 		{
-			case NeuronType.Input:
-				x = Margin;
-				y = CalculateVerticalPosition(index, BrainInstance.numInputNeurons, panelHeight);
-				break;
-			case NeuronType.Output:
-				x = panelWidth - Margin;
-				y = CalculateVerticalPosition(index - BrainInstance.NeuronsCount() + BrainInstance.numOutputNeurons, BrainInstance.numOutputNeurons, panelHeight);
-				break;
-			case NeuronType.Hidden:
-				x = (float)GD.RandRange(Margin + InputOutputSpacing, panelWidth - Margin - InputOutputSpacing);
-				y = (float)GD.RandRange(Margin, panelHeight - Margin);
-				break;
-			default:
-				x = 0; y = 0;
-				GD.Print((nameof(type), "Invalid neuron type."));
-				break;
+			x = Margin;
+		}
+		else if (neuronLayer == totalLayers)
+		{
+			x = panelWidth - Margin;
+		}
+		else
+		{
+			x = (((float)neuronLayer / totalLayers) * (panelWidth - (2 * Margin))) + Margin;
 		}
 		//Debug.Log($"Neuron {index} position: {x}, {y}");
+		y = CalculateVerticalPosition(neuronIndexInLayer, neuronsInLayer, panelHeight);
 		return new Vector2(x, y);
 	}
+
 
 	private float CalculateVerticalPosition(int index, int totalNeuronsOfType, float panelHeight)
 	{

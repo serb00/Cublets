@@ -31,14 +31,14 @@ public class Neuron
     /// </summary>
     readonly float _bias;
 
-    public Neuron(int id)
+    public Neuron(int id, NeuronActivationFunction? activationFunction = null)
     {
         Connections = new List<Connection>();
         ID = id;
         OutputValue = (float)GD.RandRange(-1f, 1f);
         _bias = (float)GD.RandRange(-1f, 1f);
-        
-        ActivationFunction = Utils.GetRandomEnumValue<NeuronActivationFunction>();
+        // if activationFunction is not specified, use a random one
+        ActivationFunction = activationFunction ?? Utils.GetRandomEnumValue<NeuronActivationFunction>();
     }
 
 
@@ -52,7 +52,7 @@ public class Neuron
         {
             tempValue += conn.SourceNeuron.OutputValue * conn.Weight;
         }
-        OutputValue = ScaleSignal(tempValue + _bias, -Connections.Count - 1, Connections.Count + 1);
+        OutputValue = Utils.ScaleValue(tempValue + _bias, -Connections.Count - 1, Connections.Count + 1);
 
         Activate();
     }
@@ -87,20 +87,8 @@ public class Neuron
     /// <param name="val">The input value.</param>
     /// <param name="bottomBoundary">The bottom boundary of the neuron's output value.</param>
     /// <param name="topBoundary">The top boundary of the neuron's output value.</param>
-    public void SetValue(float val, float bottomBoundary = -1, float topBoundary = -1)
+    public void SetValue(float val)
     {
-        OutputValue = ScaleSignal(val, bottomBoundary, topBoundary);
-    }
-
-    /// <summary>
-    /// Scales a value between a specified bottom and top boundary.
-    /// </summary>
-    /// <param name="val">The value to be scaled.</param>
-    /// <param name="bottomBoundary">The bottom boundary of the scaling range.</param>
-    /// <param name="topBoundary">The top boundary of the scaling range.</param>
-    /// <returns>The scaled value.</returns>
-    public static float ScaleSignal(float val, float bottomBoundary, float topBoundary)
-    {
-        return (val - bottomBoundary) / (topBoundary - bottomBoundary);
+        OutputValue = val;
     }
 }

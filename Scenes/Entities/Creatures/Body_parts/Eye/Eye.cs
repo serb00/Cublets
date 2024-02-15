@@ -235,15 +235,19 @@ public partial class Eye : BodyPart
 
 	private float[] ConvertVisibleEntitiesToNeuronActivators()
 	{
-		var procesingEntities = VisibleEntities.Take(_eyeData.EyeComplexity);
+		// take only the biggest entities with limit to EyeComplexity to process
+		var procesingEntities = VisibleEntities.OrderBy(entity => entity.size).Take(_eyeData.EyeComplexity);
 		float[] activators = new float[procesingEntities.Count() * _eyeData.ActivatorPerEntity];
 		int idx = 0;
 		foreach (var entity in procesingEntities)
 		{
 			// TODO: convert values into neuron activators. means resulting values should be between -1 and 1
-			activators[idx * _eyeData.ActivatorPerEntity + 0] = entity.entityType.GetHashCode();
-			activators[idx * _eyeData.ActivatorPerEntity + 1] = entity.angle.Y;
-			activators[idx * _eyeData.ActivatorPerEntity + 2] = entity.size;
+			activators[idx * _eyeData.ActivatorPerEntity + 0] = Utils.ScaleValue((int)entity.entityType, 0, Utils.GetCountOfEnumValues<EntityType>());
+			activators[idx * _eyeData.ActivatorPerEntity + 1] = Utils.ScaleValue(entity.angle.Y, -_eyeData.FOVHorizontal / 2, _eyeData.FOVHorizontal / 2);
+			activators[idx * _eyeData.ActivatorPerEntity + 2] = Utils.ScaleValue(entity.size, 0, 100);
+
+			// GD.Print($"Activators: {activators[idx * _eyeData.ActivatorPerEntity + 0]}, {activators[idx * _eyeData.ActivatorPerEntity + 1]}, {activators[idx * _eyeData.ActivatorPerEntity + 2]}");
+			// GD.Print($"Entity: {entity.entityType}, {entity.angle.Y}, {entity.size}");
 			idx += 1;
 		}
 		return activators;
@@ -306,8 +310,8 @@ public partial class Eye : BodyPart
 		// Use the cross product to determine if the object is to the left or right
 		Vector3 crossProduct = creatureForward.Cross(directionToObject);
 
-		// If crossProduct.y is positive, the object is to the right, otherwise it's to the left
-		if (crossProduct.Y < 0)
+		// If crossProduct.y is positive, the object is to the left, otherwise it's to the right
+		if (crossProduct.Y > 0)
 		{
 			angle = -angle;
 		}
