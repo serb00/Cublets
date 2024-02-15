@@ -143,7 +143,8 @@ public partial class Creature : CharacterBody3D, IVisible
 
     private void InitializeBrain()
     {
-        _brain.Initialize(InputNeuronsList, OutputNeuronsList, 7, 1);
+
+        _brain.Initialize(InputNeuronsList, OutputNeuronsList, GD.RandRange(0, 7), 1);
     }
 
     public Brain GetBrain()
