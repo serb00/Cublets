@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Godot;
 using System;
+using System.Linq;
 
 /// <summary>
 /// Represents a creature in the game.
@@ -288,8 +289,9 @@ public partial class Creature : CharacterBody3D, IVisible
 
     public override void _PhysicsProcess(double delta)
     {
-        var velocityNeuron = _brain.GetNeuron(_brain.NumTotalNeurons - _brain.NumOutputNeurons);
-        var rotationNeuron = _brain.GetNeuron(_brain.NumTotalNeurons - _brain.NumOutputNeurons + 1);
+        var movementNeurons = _brain.NeuronsMap.FindAll(x => x.Type == BrainZoneType.Movement).OrderBy(x => x.ID).Select(x => x.ID).ToArray();
+        var velocityNeuron = _brain.GetNeuron(movementNeurons[0]);
+        var rotationNeuron = _brain.GetNeuron(movementNeurons[1]);
 
         Velocity = Vector3.Forward * velocityNeuron * 20;
         RotateY(rotationNeuron / 20);

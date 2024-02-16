@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_b58k5")
-Name = "Eye_001"
+Name = "Eye_003"
 Scene = ExtResource("1_kbf6l")
 ViewDistance = 100.0
 FOVHorizontal = 90.0
@@ -14,3 +14,4 @@ Scale = Vector3(0.2, 0.2, 0.2)
 UpdateIntervalSeconds = 0.5
 EyeComplexity = 10
 ActivatorPerEntity = 3
+BaseEnergyMultiplaier = 100.0
