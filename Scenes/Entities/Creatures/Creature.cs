@@ -15,7 +15,7 @@ public partial class Creature : CharacterBody3D, IVisible
 
     #region Parameters
 
-    double updateBrainIntervalSeconds = 0.1;
+    double updateBrainIntervalSeconds = 0.5;
     double secondsSinceLastBrainUpdate = 0;
 
     #endregion Parameters

@@ -143,7 +143,7 @@ public partial class Mouth : BodyPart
 				{
 					var energy = consumable.Consume();
 					Creature creature = Utils.GetFirstParentOfType<Creature>(this);
-					GD.Print($"Creature {creature.Name} consumed {energy} energy from {data.entityType} {area.Name}");
+					// GD.Print($"Creature {creature.Name} consumed {energy} energy from {data.entityType} {area.Name}");
 				}
 			}
 			else if (_mouthData.Diet == DietType.Carnivore)

@@ -5,6 +5,9 @@ using System.Linq;
 
 public partial class BrainVisualizer : Panel
 {
+
+	#region Attributes
+
 	[Export] public PackedScene NeuronScene;
 	Vector2 NeuronSize = new(20, 20);
 	[Export] public PackedScene ConnectionScene;
@@ -26,7 +29,18 @@ public partial class BrainVisualizer : Panel
 	private readonly Color ColorMin = Colors.Red;
 	private readonly Color ColorMid = Colors.White;
 	private readonly Color ColorMax = Colors.Green;
+
+	#endregion Attributes
+
+	#region Parameters
+
+	[Export] public double UpdateIntervalSeconds = 0.5;
+
 	double timeSinceLastUpdate = 0f;
+
+	#endregion Parameters
+
+	#region Constructors
 
 	public void SetBrainInstance(Brain brain)
 	{
@@ -43,18 +57,6 @@ public partial class BrainVisualizer : Panel
 		Margin = panelWidth / 10;
 	}
 
-	private void ClearGraph()
-	{
-		neuronNodes ??= new List<TextureRect>();
-		neuronNodes.Clear();
-		connectionNodes ??= new List<TextureRect>();
-		connectionNodes.Clear();
-		foreach (var child in GetChildren())
-		{
-			child.QueueFree();
-		}
-	}
-
 	private void CreateGraph()
 	{
 		// Access the neurons from the Brain's NeuralNetwork
@@ -63,7 +65,7 @@ public partial class BrainVisualizer : Panel
 			NeuronType type = DetermineNeuronType(neuron.ID);
 			var neuronNode = NeuronScene.Instantiate<TextureRect>();
 			AddChild(neuronNode);
-			neuronNode.Position = GetNeuronPosition(neuron.ID, type) - NeuronSize / 2; // Assuming 2D and GetNeuronPosition returns a Vector2
+			neuronNode.Position = GetNeuronPosition(neuron.ID, type) - NeuronSize / 2;
 			neuronNode.Name = $"Neuron {neuron.ID} - {type}";
 			neuronNodes.Insert(neuron.ID, neuronNode); // Ensure neuronGameObjects is initialized
 		}
@@ -88,21 +90,47 @@ public partial class BrainVisualizer : Panel
 		}
 	}
 
+	#endregion Constructors
+
+	#region Logic
+
+	private void ClearGraph()
+	{
+		neuronNodes ??= new List<TextureRect>();
+		neuronNodes.Clear();
+		connectionNodes ??= new List<TextureRect>();
+		connectionNodes.Clear();
+		foreach (var child in GetChildren())
+		{
+			child.QueueFree();
+		}
+	}
+
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
 		base._Process(delta);
-		// Update the Brain every 0.5 seconds
 		if (BrainInstance is not null)
 		{
 			timeSinceLastUpdate += delta;
-			if (timeSinceLastUpdate > 0.5f)
+			if (timeSinceLastUpdate > UpdateIntervalSeconds)
 			{
 				UpdateGraph();
 				timeSinceLastUpdate = 0f;
 			}
 		}
 	}
+
+	private void UpdateGraph()
+	{
+		// Update neurons' colors based on their output values
+		for (int i = 0; i < BrainInstance.NeuronsCount(); i++)
+		{
+			UpdateNeuronColor(neuronNodes[i], BrainInstance.GetNeuron(i));
+		}
+	}
+
+	#endregion Logic
 
 	#region DrawingConnections
 	private void CreateLinearConnection(Connection connection)
@@ -236,12 +264,4 @@ public partial class BrainVisualizer : Panel
 
 	#endregion DrawingNeurons
 
-	private void UpdateGraph()
-	{
-		// Update neurons' colors based on their output values
-		for (int i = 0; i < BrainInstance.NeuronsCount(); i++)
-		{
-			UpdateNeuronColor(neuronNodes[i], BrainInstance.GetNeuron(i));
-		}
-	}
 }
