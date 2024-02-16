@@ -11,6 +11,5 @@ public struct VisibleEntityData
     public float size;
     public Vector3 angle;
     public float distance;
-    public float differenceToMe;
 
 }
