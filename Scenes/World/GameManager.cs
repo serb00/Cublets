@@ -18,7 +18,6 @@ public partial class GameManager : Node
 		base._Ready();
 		InitializeVariables();
 
-		LoadSimulationParameters();
 		StartSimulationCycle();
 	}
 
@@ -30,13 +29,9 @@ public partial class GameManager : Node
 		_parameters = GetNode<SimulationParameters>("SimulationParameters");
 	}
 
-	void LoadSimulationParameters()
-	{
-		// Load your simulation parameters here
-	}
-
 	void StartSimulationCycle()
 	{
+
 		if (population.Count == 0)
 		{
 			// Generate initial population
@@ -51,6 +46,7 @@ public partial class GameManager : Node
 
 	void GenerateInitialPopulation(int size)
 	{
+		GD.Print("Generating initial population");
 		for (int i = 0; i < size; i++)
 		{
 			// Generate and add new Creature based on parameters
@@ -67,11 +63,13 @@ public partial class GameManager : Node
 
 	void CalculateFitnessForPopulation()
 	{
+		GD.Print("Calculating fitness for population");
 		// Implement fitness calculation for each creature
 	}
 
 	void PrepareNextGeneration()
 	{
+		GD.Print("Preparing next generation");
 		// Sort population based on fitness
 		var sortedByFitness = population.OrderByDescending(creature => creature.Fitness).ToList();
 
