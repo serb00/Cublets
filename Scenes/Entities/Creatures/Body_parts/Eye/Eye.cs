@@ -274,6 +274,8 @@ public partial class Eye : BodyPart
 	{
 		if (activators.Length > 0)
 		{
+			// Find the neurons ID's that are linked to this Eye
+			// var neurons = _brainRef.NeuronsMap.FindAll(x => x.BodyPartLink == this).OrderBy(x => x.ID).Select(x => x.ID).ToArray();
 			for (int i = 0; i < activators.Length; i++)
 			{
 				_brainRef.SetNeuronValue(_neuronInputIndexes[i], activators[i]);

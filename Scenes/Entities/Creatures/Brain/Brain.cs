@@ -93,11 +93,19 @@ public class Brain
                 {
                     case BodyPartType.Eye:
                         Eye eye = item.BodyPartLink as Eye;
+                        // Get activators count for the eye by taking the minimum of the number of fields in the VisibleEntityData class and the number of activators per entity
+                        int activatorsCount = Math.Min(typeof(VisibleEntityData).GetFields().Length, eye._eyeData.ActivatorPerEntity);
                         for (int i = 0; i < eye._eyeData.EyeComplexity; i++)
                         {
-                            NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.Sigmoid, item.BodyPartLink, 0));
-                            NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.HyperbolicTangent, item.BodyPartLink, 0));
-                            NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.Sigmoid, item.BodyPartLink, 0));
+                            // Add neurons for each activator
+                            if (activatorsCount > 0)
+                                NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.Sigmoid, item.BodyPartLink, 0));
+                            if (activatorsCount > 1)
+                                NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.HyperbolicTangent, item.BodyPartLink, 0));
+                            if (activatorsCount > 2)
+                                NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.Sigmoid, item.BodyPartLink, 0));
+                            if (activatorsCount > 3)
+                                NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.HyperbolicTangent, item.BodyPartLink, 0));
                         }
                         break;
                     case BodyPartType.Mouth:
