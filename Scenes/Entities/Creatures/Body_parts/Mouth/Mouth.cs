@@ -29,7 +29,9 @@ public partial class Mouth : BodyPart
 	public override void Initialize(Vector3 position, Vector3 rotation)
 	{
 		base.Type = BodyPartType.Mouth;
-		_brainRef = Utils.GetFirstParentOfType<Creature>(this).GetBrain();
+		Creature creature = Utils.GetFirstParentOfType<Creature>(this);
+		_brainRef = creature.GetBrain();
+		creature._energyManager.AdjustMaxEnergy(_mouthData.OutputNeurons * _mouthData.BaseEnergyMultiplaier);
 
 		rotation += _mouthData.Rotation;
 		AddModel(position, rotation);

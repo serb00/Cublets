@@ -27,7 +27,7 @@ public partial class Creature : CharacterBody3D, IVisible
 
     readonly Brain _brain = new();
     Body _body;
-    // [Export] public PackedScene[] _bodyParts;
+    public EnergyManager _energyManager = new(0);
 
     /// <summary>
     /// List of body parts that the creature has.
@@ -51,14 +51,14 @@ public partial class Creature : CharacterBody3D, IVisible
 
         //prefill body parts list
         CreateBodyPartsList();
-
         Body bodyScene = _bodyScene.Instantiate() as Body;
         _body = bodyScene;
-        bodyScene.Initialize(ParentForBodyParts);
+        bodyScene.Initialize(this);
         AddChild(bodyScene);
         InitializeBodyParts();
         InitializeBrain();
         ConnectBrainToBodyParts();
+        _energyManager.MaximizeEnergy();
     }
 
     private void ConnectBrainToBodyParts()
@@ -160,7 +160,7 @@ public partial class Creature : CharacterBody3D, IVisible
     private void InitializeBrain()
     {
 
-        _brain.Initialize(InputNeuronsList, OutputNeuronsList, GD.RandRange(minHiddenLayers, maxHiddenLayers), 1);
+        _brain.Initialize(InputNeuronsList, OutputNeuronsList, GD.RandRange(minHiddenLayers, maxHiddenLayers), 1, this);
     }
 
     private void InitializeBodyParts()
@@ -273,9 +273,9 @@ public partial class Creature : CharacterBody3D, IVisible
         return _brain;
     }
 
-    public EntityData GetEntityData()
+    public VisibleEntityData GetEntityData()
     {
-        return new EntityData
+        return new VisibleEntityData
         {
             entityType = EntityType.Creature,
             size = _body.GetSize(),

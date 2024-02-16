@@ -4,20 +4,21 @@ using Godot;
 public partial class GameManager : Node
 {
 	Main _main;
-	Control _panel;
+	UIPanel _panel;
 	Creature selectedCreature;
 
 	public void SetSelectedCreature(Creature creature)
 	{
 		selectedCreature = creature;
-		GD.Print($"Creature: {selectedCreature.Name} selected.");
+		_panel.SetCreature(selectedCreature);
+		// GD.Print($"Creature: {selectedCreature.Name} selected.");
 	}
 
 	public override void _Ready()
 	{
 		base._Ready();
 		_main = GetParent<Main>();
-		_panel = _main.GetNode<Control>("Panel");
+		_panel = _main.GetNode<Control>("Panel") as UIPanel;
 		_panel.Visible = false;
 	}
 

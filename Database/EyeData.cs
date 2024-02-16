@@ -32,4 +32,6 @@ public partial class EyeData : Resource
 	/// </summary>
 	[Export] public int ActivatorPerEntity { get; set; } = 3;
 
+	[Export] public float BaseEnergyMultiplaier { get; set; } = 100;
+
 }

@@ -29,7 +29,7 @@ public partial class Eye : BodyPart
 	/// <summary>
 	/// A list of entities that are currently visible to the Eye.
 	/// </summary>
-	private List<EntityData> VisibleEntities = new();
+	private List<VisibleEntityData> VisibleEntities = new();
 
 	#endregion Attributes
 
@@ -67,7 +67,9 @@ public partial class Eye : BodyPart
 		base.Type = BodyPartType.Eye;
 		_FOVHorizontal = _eyeData.FOVHorizontal;
 		_FOVVertical = _eyeData.FOVVertical;
-		_brainRef = Utils.GetFirstParentOfType<Creature>(this).GetBrain();
+		Creature creature = Utils.GetFirstParentOfType<Creature>(this);
+		_brainRef = creature.GetBrain();
+		creature._energyManager.AdjustMaxEnergy(_eyeData.EyeComplexity * _eyeData.ActivatorPerEntity * _eyeData.BaseEnergyMultiplaier);
 
 		var eyeModel = AddModel(position, rotation);
 		AddVision(eyeModel);
@@ -100,8 +102,8 @@ public partial class Eye : BodyPart
 		Vector3[] points = GenerateFOVMeshPoints(optimalSegmentAngle);
 		CreateConvexCollisionShapeForMesh(points, _visionArea, needToTurn);
 
-		_visionArea.AreaEntered += OnVisionAreaAreaEntered;
-		_visionArea.AreaExited += OnVisionAreaAreaExited;
+		// _visionArea.AreaEntered += OnVisionAreaAreaEntered;
+		// _visionArea.AreaExited += OnVisionAreaAreaExited;
 	}
 
 	private float GetOptimalSegmentAngle()
@@ -238,23 +240,35 @@ public partial class Eye : BodyPart
 
 	private float[] ConvertVisibleEntitiesToNeuronActivators()
 	{
-		// take only the biggest entities with limit to EyeComplexity to process
-		var procesingEntities = VisibleEntities.OrderBy(entity => entity.size).Take(_eyeData.EyeComplexity);
-		float[] activators = new float[procesingEntities.Count() * _eyeData.ActivatorPerEntity];
+		// Assuming VisibleEntities is sorted in descending order to get the biggest entities first.
+		// If you want the biggest entities, you should use OrderByDescending instead of OrderBy.
+		var procesingEntities = VisibleEntities.OrderByDescending(entity => entity.size).Take(_eyeData.EyeComplexity);
+
+		// I expect up to maxActivators values per entity
+		int maxActivators = typeof(VisibleEntityData).GetFields().Length;
+
+		// If _eyeData.ActivatorPerEntity is less than maxActivators, this will not fill all types of data for each entity.
+		int activatorsCount = Math.Min(maxActivators, _eyeData.ActivatorPerEntity);
+		float[] activators = new float[procesingEntities.Count() * activatorsCount];
 		int idx = 0;
+
 		foreach (var entity in procesingEntities)
 		{
-			// TODO: convert values into neuron activators. means resulting values should be between -1 and 1
-			activators[idx * _eyeData.ActivatorPerEntity + 0] = Utils.ScaleValue((int)entity.entityType, 0, Utils.GetCountOfEnumValues<EntityType>());
-			activators[idx * _eyeData.ActivatorPerEntity + 1] = Utils.ScaleValue(entity.angle.Y, -_eyeData.FOVHorizontal / 2, _eyeData.FOVHorizontal / 2);
-			activators[idx * _eyeData.ActivatorPerEntity + 2] = Utils.ScaleValue(entity.size, 0, 100);
+			// Ensure we don't exceed the limit of _eyeData.ActivatorPerEntity
+			if (activatorsCount > 0)
+				activators[idx * activatorsCount + 0] = Utils.ScaleValue((int)entity.entityType, 0, Utils.GetCountOfEnumValues<EntityType>());
+			if (activatorsCount > 1)
+				activators[idx * activatorsCount + 1] = Utils.ScaleValue(entity.angle.Y, -_eyeData.FOVHorizontal / 2, _eyeData.FOVHorizontal / 2);
+			if (activatorsCount > 2)
+				activators[idx * activatorsCount + 2] = Utils.ScaleValue(entity.size, 0, 100);
+			if (activatorsCount > 3)
+				activators[idx * activatorsCount + 3] = Utils.ScaleValue(entity.distance, 0, _eyeData.ViewDistance);
 
-			// GD.Print($"Activators: {activators[idx * _eyeData.ActivatorPerEntity + 0]}, {activators[idx * _eyeData.ActivatorPerEntity + 1]}, {activators[idx * _eyeData.ActivatorPerEntity + 2]}");
-			// GD.Print($"Entity: {entity.entityType}, {entity.angle.Y}, {entity.size}");
 			idx += 1;
 		}
 		return activators;
 	}
+
 
 	private void ActivateNeurons(float[] activators)
 	{
@@ -284,6 +298,7 @@ public partial class Eye : BodyPart
 			{
 				var data = visible.GetEntityData();
 				data.angle = CalculateAngleBetweenCreatureAndEntity(visible);
+				data.distance = (visible as Node3D).GlobalTransform.Origin.DistanceTo(this.GlobalTransform.Origin);
 				//GD.Print($"Eye {Name} sees {(visible as Node3D).Name} at {data.angle} degrees");
 				VisibleEntities.Add(data);
 			}

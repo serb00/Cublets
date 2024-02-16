@@ -20,5 +20,6 @@ public partial class MouthData : Resource
 	[ExportCategory("Area Category")]
 	[Export] public Vector3 Size { get; set; }
 	[Export] public int OutputNeurons { get; set; }
+	[Export] public float BaseEnergyMultiplaier { get; set; } = 100;
 
 }

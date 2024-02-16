@@ -38,9 +38,9 @@ public partial class Food : Area3D, IConsumable, IVisible
 	{
 	}
 
-	public EntityData GetEntityData()
+	public VisibleEntityData GetEntityData()
 	{
-		return new EntityData
+		return new VisibleEntityData
 		{
 			entityType = EntityType.Food,
 			size = foodScale

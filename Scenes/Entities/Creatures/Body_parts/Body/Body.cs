@@ -6,14 +6,13 @@ public partial class Body : CollisionShape3D
 {
 	[Export] BodyData _bodyData;
 	[Export] CollisionShape3D _collisionShape3D;
-	float _maxEnergy;
 	Vector3 _scale;
 
-	public void Initialize(Node3D bodyPartsParent)
+	public void Initialize(Creature creature)
 	{
 
 		// GD.Print("Body Initialize");
-		_maxEnergy = _bodyData.Size * 500;
+		creature._energyManager.AdjustMaxEnergy(_bodyData.Size * 500);
 
 		// collision shape is centered, therefore we need to set the position to half the size of the body
 		_collisionShape3D.Position = new Vector3(0, _bodyData.Size / 2, 0);

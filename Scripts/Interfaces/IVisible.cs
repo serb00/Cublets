@@ -2,13 +2,15 @@ using Godot;
 
 public interface IVisible
 {
-    EntityData GetEntityData();
+    VisibleEntityData GetEntityData();
 }
 
-public struct EntityData
+public struct VisibleEntityData
 {
     public EntityType entityType;
     public float size;
     public Vector3 angle;
+    public float distance;
+    public float differenceToMe;
 
 }
