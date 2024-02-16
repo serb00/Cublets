@@ -44,6 +44,7 @@ public partial class Creature : CharacterBody3D, IVisible
 
     readonly List<BrainZone> InputNeuronsList = new();
     readonly List<BrainZone> OutputNeuronsList = new();
+    public float Fitness { get; set; }
 
     #endregion Attributes
 

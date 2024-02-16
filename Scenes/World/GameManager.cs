@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public partial class GameManager : Node
@@ -7,6 +8,100 @@ public partial class GameManager : Node
 	UIPanel _panel;
 	Creature selectedCreature;
 
+	List<Creature> population = new();
+
+	SimulationParameters _parameters;
+	double currentGenerationTime = 0;
+
+	public override void _Ready()
+	{
+		base._Ready();
+		InitializeVariables();
+
+		LoadSimulationParameters();
+		StartSimulationCycle();
+	}
+
+	private void InitializeVariables()
+	{
+		_main = GetParent<Main>();
+		_panel = _main.GetNode<Control>("Panel") as UIPanel;
+		_panel.Visible = false;
+		_parameters = GetNode<SimulationParameters>("SimulationParameters");
+	}
+
+	void LoadSimulationParameters()
+	{
+		// Load your simulation parameters here
+	}
+
+	void StartSimulationCycle()
+	{
+		if (population.Count == 0)
+		{
+			// Generate initial population
+			GenerateInitialPopulation(_parameters.InitialPopulationSize);
+		}
+
+		// Run simulation for a defined amount of time
+		currentGenerationTime = 0;
+		// You might use a timer or check for a condition within _Process or _PhysicsProcess
+
+	}
+
+	void GenerateInitialPopulation(int size)
+	{
+		for (int i = 0; i < size; i++)
+		{
+			// Generate and add new Creature based on parameters
+			Creature newCreature = GenerateCreatureBasedOnParameters();
+			population.Add(newCreature);
+		}
+	}
+
+	Creature GenerateCreatureBasedOnParameters()
+	{
+		// Implement creature generation based on your parameters
+		return new Creature(); // Placeholder
+	}
+
+	void CalculateFitnessForPopulation()
+	{
+		// Implement fitness calculation for each creature
+	}
+
+	void PrepareNextGeneration()
+	{
+		// Sort population based on fitness
+		var sortedByFitness = population.OrderByDescending(creature => creature.Fitness).ToList();
+
+		// Take top entities
+		var nextGeneration = sortedByFitness.Take(10).ToList();
+
+		// Mutate and add new entities based on top entities
+		for (int i = 0; i < 60; i++)
+		{
+			Creature mutated = MutateCreature(nextGeneration[i % nextGeneration.Count]);
+			nextGeneration.Add(mutated);
+		}
+
+		// Generate new entities
+		for (int i = 0; i < 30; i++)
+		{
+			Creature newCreature = GenerateCreatureBasedOnParameters();
+			nextGeneration.Add(newCreature);
+		}
+
+		// Set population to next generation
+		population = nextGeneration;
+	}
+
+	Creature MutateCreature(Creature baseCreature)
+	{
+		// Implement mutation based on a creature
+		return new Creature(); // Placeholder
+	}
+
 	public void SetSelectedCreature(Creature creature)
 	{
 		selectedCreature = creature;
@@ -14,17 +109,23 @@ public partial class GameManager : Node
 		// GD.Print($"Creature: {selectedCreature.Name} selected.");
 	}
 
-	public override void _Ready()
-	{
-		base._Ready();
-		_main = GetParent<Main>();
-		_panel = _main.GetNode<Control>("Panel") as UIPanel;
-		_panel.Visible = false;
-	}
-
 	public override void _PhysicsProcess(double delta)
 	{
 		base._PhysicsProcess(delta);
+		currentGenerationTime += delta;
+		if (currentGenerationTime > _parameters.TimePerGenerationSeconds)
+		{
+			// Stop simulation and calculate fitness
+			CalculateFitnessForPopulation();
+
+			// Define population for the next cycle
+			PrepareNextGeneration();
+
+			// Start next simulation cycle
+			StartSimulationCycle();
+		}
+
+		#region InputManagement
 
 		if (Input.IsActionJustPressed("spawn_creature"))
 		{
@@ -55,28 +156,6 @@ public partial class GameManager : Node
 		}
 		if (Input.IsActionJustPressed("Action2"))
 		{
-			int i = -180;
-			var s = DNASerializer.IntToBinaryString(i);
-			GD.Print($" {i} = {s} in binary");
-			i = DNASerializer.BinaryStringToInt(s);
-			GD.Print($" {s} = {i} as int");
-			i = 18000;
-			s = DNASerializer.IntToBinaryString(i);
-			GD.Print($" {i} = {s} in binary");
-			i = DNASerializer.BinaryStringToInt(s);
-			GD.Print($" {s} = {i} as int");
-			float f = -1.12311231231234f;
-			s = DNASerializer.FloatToBinaryString(f, 8);
-			GD.Print($" {f} = {s} in binary");
-			var nf = DNASerializer.BinaryStringToFloat(s);
-			GD.Print($" {s} = {nf} as float");
-			GD.Print($" difference = {nf - f} as float");
-			f = 0.12311231231234f;
-			s = DNASerializer.FloatToBinaryString(f, 8);
-			GD.Print($" {f} = {s} in binary");
-			nf = DNASerializer.BinaryStringToFloat(s);
-			GD.Print($" {s} = {f} as float");
-			GD.Print($" difference = {nf - f} as float");
 
 		}
 		if (Input.IsActionJustPressed("Action3"))
@@ -88,5 +167,8 @@ public partial class GameManager : Node
 
 		}
 
+		#endregion InputManagement
+
 	}
+
 }

@@ -1,8 +1,9 @@
-[gd_scene load_steps=19 format=3 uid="uid://dc55xmbtnwgx3"]
+[gd_scene load_steps=20 format=3 uid="uid://dc55xmbtnwgx3"]
 
 [ext_resource type="Script" path="res://Scenes/World/Main.cs" id="1_wxmxv"]
 [ext_resource type="PackedScene" uid="uid://3ja6th6yxf8r" path="res://Scenes/Entities/Food/food.tscn" id="3_55uh5"]
 [ext_resource type="PackedScene" uid="uid://bupummhvg87px" path="res://Scenes/Entities/Creatures/Creature.tscn" id="4_d7aw4"]
+[ext_resource type="Script" path="res://Scenes/World/SimulationParameters.cs" id="5_2lmqp"]
 [ext_resource type="Script" path="res://Scripts/UI/MouseRaycaster.cs" id="5_b6ovi"]
 [ext_resource type="Script" path="res://addons/free_look_camera/free_look_camera.gd" id="6_4o7is"]
 [ext_resource type="Script" path="res://Scenes/UI/UIPanel.cs" id="7_rvmxc"]
@@ -45,6 +46,10 @@ _creatureScene = ExtResource("4_d7aw4")
 
 [node name="GameManager" parent="." instance=ExtResource("12_i68q3")]
 process_mode = 3
+
+[node name="SimulationParameters" type="Node" parent="GameManager"]
+script = ExtResource("5_2lmqp")
+InitialPopulationSize = 100
 
 [node name="Level" type="Node" parent="."]
 
