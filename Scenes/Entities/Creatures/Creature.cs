@@ -21,6 +21,9 @@ public partial class Creature : CharacterBody3D, IVisible
     [Export] int minHiddenLayers = 0;
     [Export] int maxHiddenLayers = 2;
 
+    [Export] float VelocityMultiplier = 20;
+    [Export] float RotationMultiplier = 0.05f;
+
 
     #endregion Parameters
 
@@ -293,8 +296,8 @@ public partial class Creature : CharacterBody3D, IVisible
         var velocityNeuron = _brain.GetNeuron(movementNeurons[0]);
         var rotationNeuron = _brain.GetNeuron(movementNeurons[1]);
 
-        Velocity = Vector3.Forward * velocityNeuron * 20;
-        RotateY(rotationNeuron / 20);
+        Velocity = Vector3.Forward * velocityNeuron * VelocityMultiplier;
+        RotateY(rotationNeuron * RotationMultiplier);
         Velocity = Velocity.Rotated(Vector3.Up, Rotation.Y);
 
         MoveAndSlide();
