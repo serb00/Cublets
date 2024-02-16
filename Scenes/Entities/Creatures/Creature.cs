@@ -17,6 +17,9 @@ public partial class Creature : CharacterBody3D, IVisible
 
     double updateBrainIntervalSeconds = 0.5;
     double secondsSinceLastBrainUpdate = 0;
+    [Export] int minHiddenLayers = 0;
+    [Export] int maxHiddenLayers = 2;
+
 
     #endregion Parameters
 
@@ -157,7 +160,7 @@ public partial class Creature : CharacterBody3D, IVisible
     private void InitializeBrain()
     {
 
-        _brain.Initialize(InputNeuronsList, OutputNeuronsList, GD.RandRange(0, 5), 1);
+        _brain.Initialize(InputNeuronsList, OutputNeuronsList, GD.RandRange(minHiddenLayers, maxHiddenLayers), 1);
     }
 
     private void InitializeBodyParts()
@@ -281,6 +284,8 @@ public partial class Creature : CharacterBody3D, IVisible
 
     #endregion Getters
 
+    #region Logic
+
     public override void _PhysicsProcess(double delta)
     {
         var velocityNeuron = _brain.GetNeuron(_brain.NumTotalNeurons - _brain.NumOutputNeurons);
@@ -303,4 +308,7 @@ public partial class Creature : CharacterBody3D, IVisible
             secondsSinceLastBrainUpdate = 0f;
         }
     }
+
+    #endregion Logic
+
 }

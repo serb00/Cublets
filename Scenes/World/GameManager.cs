@@ -42,31 +42,14 @@ public partial class GameManager : Node
 		}
 		if (Input.IsActionJustPressed("increase_time_scale"))
 		{
-			// Engine.TimeScale *= 2;
+			Engine.TimeScale *= 2;
 		}
 		if (Input.IsActionJustPressed("decrease_time_scale"))
 		{
-			// Engine.TimeScale /= 2;
+			Engine.TimeScale /= 2;
 		}
 		if (Input.IsActionJustPressed("Action1"))
 		{
-			DNA myDna = new()
-			{
-				BodyData = new DNA.BodyStruct { Type = "Type1", Size = 1.0f },
-				BrainData = new DNA.BrainStruct { Complexity = 5, NumLayers = 3 },
-				EyesData = new List<DNA.EyeStruct>
-					{
-						new() { ID = 1, Angle = new Vector3(0, 1, 2) }
-					},
-				MouthsData = new List<DNA.MouthStruct>
-					{
-						new() { ID = 1, Angle = new Vector3(0, 1, 2) }
-					},
-				Brain = selectedCreature.GetBrain()
-			};
-
-			string encodedDna = DNASerializer.EncodeDNA(myDna);
-			GD.Print($"Encoded DNA: {encodedDna}");
 
 		}
 		if (Input.IsActionJustPressed("Action2"))
