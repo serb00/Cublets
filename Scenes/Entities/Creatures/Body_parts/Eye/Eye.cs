@@ -13,6 +13,8 @@ using Godot;
 public partial class Eye : BodyPart
 {
 
+	#region Attributes
+
 	/// <summary>
 	/// The data related to the Eye, including its field of view, view distance, and other parameters.
 	/// </summary>
@@ -29,6 +31,7 @@ public partial class Eye : BodyPart
 	/// </summary>
 	private List<EntityData> VisibleEntities = new();
 
+	#endregion Attributes
 
 	// public Brain _brainRef;
 

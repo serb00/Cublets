@@ -111,8 +111,6 @@ public class Brain
         return idx;
     }
 
-    #endregion Constructors
-
     private void InitializeMappings()
     {
         // Initialize inputMappings and outputMappings
@@ -121,6 +119,10 @@ public class Brain
             outputMappings[i] = new Action(i);
         }
     }
+
+    #endregion Constructors
+
+    #region Logic
 
     public void UpdateBrain()
     {
@@ -136,6 +138,8 @@ public class Brain
             outputMappings[i].Execute(NeuralNetwork.Neurons[outputIndex].OutputValue);
         }
     }
+
+    #endregion Logic
 
     #region NeuronHelpers
 

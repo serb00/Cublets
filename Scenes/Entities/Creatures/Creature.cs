@@ -12,6 +12,16 @@ using System;
 /// </remarks>
 public partial class Creature : CharacterBody3D, IVisible
 {
+
+    #region Parameters
+
+    double updateBrainIntervalSeconds = 0.1;
+    double secondsSinceLastBrainUpdate = 0;
+
+    #endregion Parameters
+
+    #region Attributes
+
     readonly Brain _brain = new();
     Body _body;
     // [Export] public PackedScene[] _bodyParts;
@@ -25,9 +35,12 @@ public partial class Creature : CharacterBody3D, IVisible
 
     [Export] public PackedScene _bodyScene;
 
-
     readonly List<BrainZone> InputNeuronsList = new();
     readonly List<BrainZone> OutputNeuronsList = new();
+
+    #endregion Attributes
+
+    #region Constructors
 
     public void Initialize(Vector3 position)
     {
@@ -144,12 +157,7 @@ public partial class Creature : CharacterBody3D, IVisible
     private void InitializeBrain()
     {
 
-        _brain.Initialize(InputNeuronsList, OutputNeuronsList, GD.RandRange(0, 7), 1);
-    }
-
-    public Brain GetBrain()
-    {
-        return _brain;
+        _brain.Initialize(InputNeuronsList, OutputNeuronsList, GD.RandRange(0, 5), 1);
     }
 
     private void InitializeBodyParts()
@@ -253,6 +261,15 @@ public partial class Creature : CharacterBody3D, IVisible
         }
     }
 
+    #endregion Constructors
+
+    #region Getters
+
+    public Brain GetBrain()
+    {
+        return _brain;
+    }
+
     public EntityData GetEntityData()
     {
         return new EntityData
@@ -261,6 +278,8 @@ public partial class Creature : CharacterBody3D, IVisible
             size = _body.GetSize(),
         };
     }
+
+    #endregion Getters
 
     public override void _PhysicsProcess(double delta)
     {
@@ -272,5 +291,16 @@ public partial class Creature : CharacterBody3D, IVisible
         Velocity = Velocity.Rotated(Vector3.Up, Rotation.Y);
 
         MoveAndSlide();
+    }
+
+    public override void _Process(double delta)
+    {
+        base._Process(delta);
+        secondsSinceLastBrainUpdate += delta;
+        if (secondsSinceLastBrainUpdate > updateBrainIntervalSeconds)
+        {
+            _brain.UpdateBrain();
+            secondsSinceLastBrainUpdate = 0f;
+        }
     }
 }
