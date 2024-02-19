@@ -31,6 +31,7 @@ public partial class Mouth : BodyPart
 		base.Type = BodyPartType.Mouth;
 		Creature creature = Utils.GetFirstParentOfType<Creature>(this);
 		_brainRef = creature.GetBrain();
+		_energyManager = creature._energyManager;
 		creature._energyManager.AdjustMaxEnergy(_mouthData.OutputNeurons * _mouthData.BaseEnergyMultiplaier);
 
 		rotation += _mouthData.Rotation;
@@ -144,7 +145,7 @@ public partial class Mouth : BodyPart
 				if (visible is IConsumable consumable)
 				{
 					var energy = consumable.Consume();
-					Creature creature = Utils.GetFirstParentOfType<Creature>(this);
+					_energyManager.AddEnergy(energy);
 					// GD.Print($"Creature {creature.Name} consumed {energy} energy from {data.entityType} {area.Name}");
 				}
 			}

@@ -7,6 +7,7 @@ public partial class Food : Area3D, IConsumable, IVisible
 	int MaxEnergy = 100;
 	public int Energy { get; private set; } = 10;
 	[Export] public float foodScale = 1;
+	int CalloriesMultiplier = 1000;
 
 	public void Initialize(Vector3 SpawnPosition)
 	{
@@ -19,12 +20,12 @@ public partial class Food : Area3D, IConsumable, IVisible
 	public int Consume()
 	{
 		QueueFree();
-		return Energy;
+		return Energy * CalloriesMultiplier;
 	}
 
 	public int GetEnergy()
 	{
-		return Energy;
+		return Energy * CalloriesMultiplier;
 	}
 
 

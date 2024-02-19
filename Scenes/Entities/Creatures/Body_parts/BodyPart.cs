@@ -9,6 +9,7 @@ public partial class BodyPart : Node3D
 	/// Reference to the Brain of the creature to which the Eye belongs.
 	/// </summary>
 	public Brain _brainRef;
+	public EnergyManager _energyManager;
 
 
 	public Node3D AddModel(string name, PackedScene scene, Vector3 position, Vector3 rotation, Vector3 scale, Node3D parent)
