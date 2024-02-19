@@ -32,6 +32,7 @@ public partial class Creature : CharacterBody3D, IVisible
     readonly Brain _brain = new();
     Body _body;
     public EnergyManager _energyManager;
+    public DNA _dna;
 
     /// <summary>
     /// List of body parts that the creature has.
@@ -53,20 +54,17 @@ public partial class Creature : CharacterBody3D, IVisible
 
     #region Constructors
 
-    public void Initialize(Vector3 position)
+    public void Initialize(Vector3 position, DNA dna)
     {
+        _dna = dna;
         Position = position;
-
-        _lastPosition = Position;
-        _lastRotationY = Rotation.Y;
 
         //prefill body parts list
         CreateBodyPartsList();
-        Body bodyScene = _bodyScene.Instantiate() as Body;
-        _body = bodyScene;
+        _body = _bodyScene.Instantiate() as Body;
         _energyManager = new EnergyManager(0, _body.GetSize());
-        bodyScene.Initialize(this);
-        AddChild(bodyScene);
+        _body.Initialize(this);
+        AddChild(_body);
         InitializeBodyParts();
         InitializeBrain();
         ConnectBrainToBodyParts();
@@ -87,7 +85,7 @@ public partial class Creature : CharacterBody3D, IVisible
         int brainInputNeurons = 0;
         int brainOutputNeurons = 0;
         // Eyes
-        PackedScene eyeScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Eye/Eye.tscn"); ;
+        PackedScene eyeScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Eye/Eye.tscn");
         EyeData eyeData = (EyeData)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Eye/Eyes/Eye_01.tres");
         var eye = CreateEye(
             eyeScene,

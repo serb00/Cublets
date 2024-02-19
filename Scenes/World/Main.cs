@@ -35,7 +35,7 @@ public partial class Main : Node
 		mobSpawnLocation.ProgressRatio = GD.Randf();
 
 		Vector3 playerPosition = Vector3.Zero;
-		creature.Initialize(mobSpawnLocation.Position);
+		creature.Initialize(mobSpawnLocation.Position, new DNA());
 
 		// Spawn the mob by adding it to the Main scene.
 		parentCreatures.AddChild(creature);

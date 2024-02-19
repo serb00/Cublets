@@ -54,7 +54,7 @@ script = ExtResource("5_c2w18")
 
 [node name="SimulationParameters" type="Node" parent="GameManager/SimulationManager"]
 script = ExtResource("5_2lmqp")
-TimePerGenerationSeconds = 3
+TimePerGenerationSeconds = 5
 MaxGenerations = 3
 
 [node name="Level" type="Node" parent="."]
@@ -141,7 +141,6 @@ autostart = true
 
 [node name="CreatureTimer" type="Timer" parent="Creatures"]
 wait_time = 2.0
-autostart = true
 
 [node name="Cylinders" type="Node3D" parent="Creatures"]
 visible = false

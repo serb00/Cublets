@@ -7,6 +7,7 @@ public class DNA
 {
     public struct BodyStruct
     {
+        public int ID { get; set; }
         public string Type { get; set; }
         public float Size { get; set; }
     }
@@ -40,6 +41,20 @@ public class DNA
     {
         EyesData = new List<EyeStruct>();
         MouthsData = new List<MouthStruct>();
+    }
+
+    public DNA(
+        EntityType entityType,
+        BodyStruct bodyData,
+        BrainStruct brainData,
+        List<EyeStruct> eyesData,
+        List<MouthStruct> mouthsData)
+    {
+        EntityType = entityType;
+        BodyData = bodyData;
+        BrainData = brainData;
+        EyesData = eyesData;
+        MouthsData = mouthsData;
     }
 
     public string GetDNAString()
