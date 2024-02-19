@@ -75,7 +75,7 @@ public partial class SimulationManager : Node
 
     Creature GenerateCreatureBasedOnParameters()
     {
-        // Implement creature generation based on your parameters
+        // TODO: Implement creature generation based on your parameters
         return new Creature(); // Placeholder
     }
 
@@ -95,11 +95,20 @@ public partial class SimulationManager : Node
         var nextGeneration = sortedByFitness.Take(10).ToList();
 
         // Mutate and add new entities based on top entities
-        for (int i = 0; i < 60; i++)
+        for (int i = 0; i < 30; i++)
         {
             Creature mutated = MutateCreature(
                 nextGeneration[GD.RandRange(0, nextGeneration.Count - 1)],
                 nextGeneration[GD.RandRange(0, nextGeneration.Count - 1)]);
+            nextGeneration.Add(mutated);
+        }
+
+        // Randomize creatures brains based on top entities
+        for (int i = 0; i < 30; i++)
+        {
+            Creature mutated = RandomizeBrain(
+                nextGeneration[GD.RandRange(0, nextGeneration.Count - 1)]
+            );
             nextGeneration.Add(mutated);
         }
 
@@ -118,7 +127,13 @@ public partial class SimulationManager : Node
 
     Creature MutateCreature(Creature firstParent, Creature secondParent)
     {
-        // Implement mutation based on two parents
+        // TODO: Implement mutation based on two parents
+        return new Creature(); // Placeholder
+    }
+
+    Creature RandomizeBrain(Creature creature)
+    {
+        // TODO: Implement randomization of brain
         return new Creature(); // Placeholder
     }
 
