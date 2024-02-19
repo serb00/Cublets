@@ -31,7 +31,7 @@ public partial class Creature : CharacterBody3D, IVisible
 
     readonly Brain _brain = new();
     Body _body;
-    public EnergyManager _energyManager = new(0);
+    public EnergyManager _energyManager;
 
     /// <summary>
     /// List of body parts that the creature has.
@@ -58,6 +58,7 @@ public partial class Creature : CharacterBody3D, IVisible
         CreateBodyPartsList();
         Body bodyScene = _bodyScene.Instantiate() as Body;
         _body = bodyScene;
+        _energyManager = new EnergyManager(0, _body.GetSize());
         bodyScene.Initialize(this);
         AddChild(bodyScene);
         InitializeBodyParts();
