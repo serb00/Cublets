@@ -110,6 +110,8 @@ public partial class SimulationManager : Node
             nextGeneration.Add(newCreature);
         }
 
+        // TODO: Remove old population to free memory
+
         // Set population to next generation
         population = nextGeneration;
     }
