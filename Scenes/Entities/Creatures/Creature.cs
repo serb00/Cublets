@@ -21,8 +21,8 @@ public partial class Creature : CharacterBody3D, IVisible
     [Export] int minHiddenLayers = 0;
     [Export] int maxHiddenLayers = 2;
 
-    [Export] float VelocityMultiplier = 20;
-    [Export] float RotationMultiplier = 0.05f;
+    [Export] float MaxSpeedPerSecond = 1000; // m/s
+    [Export] float MaxRotationPerSecond = 90; // degrees
 
 
     #endregion Parameters
@@ -310,27 +310,43 @@ public partial class Creature : CharacterBody3D, IVisible
         var velocityNeuron = _brain.GetNeuron(movementNeurons[0]);
         var rotationNeuron = _brain.GetNeuron(movementNeurons[1]);
 
-        // Calculate desired velocity and rotation based on neurons
-        Velocity = Vector3.Forward * velocityNeuron * VelocityMultiplier;
-        RotateY(rotationNeuron * RotationMultiplier);
-        Velocity = Velocity.Rotated(Vector3.Up, Rotation.Y);
+        // Update last position and rotation for difference calculations
+        _lastPosition = Position;
+        _lastRotationY = Rotation.Y;
 
-        // Apply movement
+        // Calculate the desired movement speed based on neuron output and delta
+        var MovementSpeed = velocityNeuron * MaxSpeedPerSecond * (float)delta;
+
+        // Calculate rotation adjustment factor based on Engine.TimeScale
+        // This tries to adjust the rotation to be proportional to the change in speed
+        var rotationAdjustmentFactor = Engine.TimeScale;
+
+        // Calculate the adjusted rotational radians, compensating for changes in speed
+        var RotateRadians = Mathf.DegToRad(rotationNeuron * MaxRotationPerSecond * (float)delta * rotationAdjustmentFactor);
+
+        // Apply the adjusted rotation before calculating the forward vector
+        RotateY((float)RotateRadians);
+
+        // Now calculate the forward direction based on the current orientation
+        // This needs to take into account the creature's global orientation, which includes the applied rotation
+        var globalOrientation = GlobalTransform.Basis.GetEuler();
+        var forwardDir = new Vector3(Mathf.Sin(globalOrientation.Y), 0, Mathf.Cos(globalOrientation.Y)).Normalized();
+
+        // Apply the calculated velocity based on the forward direction
+        Velocity = forwardDir * MovementSpeed;
+
+        // Finally, apply the movement
         MoveAndSlide();
 
         // Calculate energy consumption
         float distanceTraveled = Position.DistanceTo(_lastPosition);
-        float angleRotated = Mathf.Abs(Rotation.Y - _lastRotationY);
+        float angleRotated = Mathf.RadToDeg(Mathf.Abs(Rotation.Y - _lastRotationY));
 
         // Reduce energy based on distance and rotation
         _energyManager.SpendEnergy(
             _energyManager.CalculateEnergyConsumptionMovement(distanceTraveled) +
             _energyManager.CalculateEnergyConsumptionRotation(angleRotated)
         );
-
-        // Update last position and rotation for the next frame
-        _lastPosition = Position;
-        _lastRotationY = Rotation.Y;
     }
 
     public override void _Process(double delta)

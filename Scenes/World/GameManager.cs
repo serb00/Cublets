@@ -52,10 +52,12 @@ public partial class GameManager : Node
 		if (Input.IsActionJustPressed("increase_time_scale"))
 		{
 			Engine.TimeScale *= 2;
+			GD.Print($"TimeScale: {Engine.TimeScale}");
 		}
 		if (Input.IsActionJustPressed("decrease_time_scale"))
 		{
 			Engine.TimeScale /= 2;
+			GD.Print($"TimeScale: {Engine.TimeScale}");
 		}
 		if (Input.IsActionJustPressed("Action1"))
 		{
