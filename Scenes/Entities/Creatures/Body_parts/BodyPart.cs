@@ -28,6 +28,11 @@ public partial class BodyPart : Node3D
 
 	}
 
+	public virtual void SpendEnergy()
+	{
+
+	}
+
 }
 
 

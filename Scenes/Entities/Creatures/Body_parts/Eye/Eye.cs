@@ -240,7 +240,7 @@ public partial class Eye : BodyPart
 		}
 	}
 
-	private void SpendEnergy()
+	public override void SpendEnergy()
 	{
 		_energyManager.SpendEnergy(
 			_energyManager.CalculateEnergyConsumptionEyeProcessing(
