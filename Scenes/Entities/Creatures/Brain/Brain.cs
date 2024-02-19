@@ -179,6 +179,26 @@ public class Brain
     }
 
     #endregion NeuronHelpers
+
+    #region NetworkHelpers
+
+    public int GetSignalPasses()
+    {
+        return NeuralNetwork.SignalPasses;
+    }
+
+    public int GetNeuronConnectionsCount()
+    {
+        return NeuralNetwork.NeuronConnections;
+    }
+
+    public int GetNeuronsCount()
+    {
+        return NeuralNetwork.Neurons.Count;
+    }
+
+    #endregion NetworkHelpers
+
 }
 
 

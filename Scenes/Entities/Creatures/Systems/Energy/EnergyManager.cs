@@ -6,11 +6,11 @@ public class EnergyManager
     public float MaxEnergy { get; private set; }
 
     public float TotalEnergySpend { get; private set; } = 0;
-    private float TotalEnergyReplenished { get; private set; } = 0;
-    private float EnergyCostMovement = 1;
-    private float EnergyCostRotation = 1;
-    private float EnergyCostBrainProcessing = 1;
-    private float EnergyCostEyeProcessing = 1;
+    public float TotalEnergyReplenished { get; private set; } = 0;
+    private readonly float EnergyCostMovement = 1;
+    private readonly float EnergyCostRotation = 1;
+    private readonly float EnergyCostBrainProcessing = 1;
+    private readonly float EnergyCostEyeProcessing = 1;
 
     public EnergyManager(float maxEnergy, float size)
     {
@@ -31,7 +31,7 @@ public class EnergyManager
         TotalEnergyReplenished += CurrentEnergy - previousEnergy;
     }
 
-    public void RemoveEnergy(float energy)
+    public void SpendEnergy(float energy)
     {
         var previousEnergy = CurrentEnergy;
         CurrentEnergy -= energy;

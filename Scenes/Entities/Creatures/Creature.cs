@@ -44,6 +44,9 @@ public partial class Creature : CharacterBody3D, IVisible
 
     readonly List<BrainZone> InputNeuronsList = new();
     readonly List<BrainZone> OutputNeuronsList = new();
+
+    private Vector3 _lastPosition;
+    private float _lastRotationY;
     public float Fitness { get; set; }
 
     #endregion Attributes
@@ -53,6 +56,9 @@ public partial class Creature : CharacterBody3D, IVisible
     public void Initialize(Vector3 position)
     {
         Position = position;
+
+        _lastPosition = Position;
+        _lastRotationY = Rotation.Y;
 
         //prefill body parts list
         CreateBodyPartsList();
@@ -298,11 +304,27 @@ public partial class Creature : CharacterBody3D, IVisible
         var velocityNeuron = _brain.GetNeuron(movementNeurons[0]);
         var rotationNeuron = _brain.GetNeuron(movementNeurons[1]);
 
+        // Calculate desired velocity and rotation based on neurons
         Velocity = Vector3.Forward * velocityNeuron * VelocityMultiplier;
         RotateY(rotationNeuron * RotationMultiplier);
         Velocity = Velocity.Rotated(Vector3.Up, Rotation.Y);
 
+        // Apply movement
         MoveAndSlide();
+
+        // Calculate energy consumption
+        float distanceTraveled = Position.DistanceTo(_lastPosition);
+        float angleRotated = Mathf.Abs(Rotation.Y - _lastRotationY);
+
+        // Reduce energy based on distance and rotation
+        _energyManager.SpendEnergy(
+            _energyManager.CalculateEnergyConsumptionMovement(distanceTraveled) +
+            _energyManager.CalculateEnergyConsumptionRotation(angleRotated)
+        );
+
+        // Update last position and rotation for the next frame
+        _lastPosition = Position;
+        _lastRotationY = Rotation.Y;
     }
 
     public override void _Process(double delta)
@@ -313,6 +335,13 @@ public partial class Creature : CharacterBody3D, IVisible
         {
             _brain.UpdateBrain();
             secondsSinceLastBrainUpdate = 0f;
+            _energyManager.SpendEnergy(
+                _energyManager.CalculateEnergyConsumptionBrainProcessing(
+                    _brain.GetSignalPasses(),
+                    _brain.GetNeuronConnectionsCount(),
+                    _brain.GetNeuronsCount()
+                )
+            );
         }
     }
 
