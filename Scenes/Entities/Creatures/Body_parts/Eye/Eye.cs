@@ -31,9 +31,9 @@ public partial class Eye : BodyPart
 	/// </summary>
 	private List<VisibleEntityData> VisibleEntities = new();
 
-	#endregion Attributes
+	EnergyManager _energyManager;
 
-	// public Brain _brainRef;
+	#endregion Attributes
 
 	#region Parameters
 
@@ -68,7 +68,8 @@ public partial class Eye : BodyPart
 		_FOVHorizontal = _eyeData.FOVHorizontal;
 		_FOVVertical = _eyeData.FOVVertical;
 		Creature creature = Utils.GetFirstParentOfType<Creature>(this);
-		_brainRef = creature.GetBrain();
+		// _brainRef = creature.GetBrain();
+		_energyManager = creature._energyManager;
 		creature._energyManager.AdjustMaxEnergy(_eyeData.EyeComplexity * _eyeData.ActivatorPerEntity * _eyeData.BaseEnergyMultiplaier);
 
 		var eyeModel = AddModel(position, rotation);
@@ -235,7 +236,21 @@ public partial class Eye : BodyPart
 			UpdateVisibleEntities();
 			var activators = ConvertVisibleEntitiesToNeuronActivators();
 			ActivateNeurons(activators);
+			SpendEnergy();
 		}
+	}
+
+	private void SpendEnergy()
+	{
+		_energyManager.SpendEnergy(
+			_energyManager.CalculateEnergyConsumptionEyeProcessing(
+				_eyeData.EyeComplexity,
+				_eyeData.ActivatorPerEntity,
+				_eyeData.ViewDistance,
+				_FOVVertical,
+				_FOVHorizontal
+			)
+		);
 	}
 
 	private float[] ConvertVisibleEntitiesToNeuronActivators()

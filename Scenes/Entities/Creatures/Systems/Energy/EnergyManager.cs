@@ -74,7 +74,7 @@ public class EnergyManager
         return energyConsumed;
     }
 
-    public float CalculateEnergyConsumptionEyeProcessing(int EyeComplexity, int ActivatorPerEntity, float distance, int FOVVertical, int FOVHorizontal)
+    public float CalculateEnergyConsumptionEyeProcessing(int EyeComplexity, int ActivatorPerEntity, float distance, float FOVVertical, float FOVHorizontal)
     {
         float energyConsumed = EyeComplexity * ActivatorPerEntity * distance * (FOVVertical / 180) * (FOVHorizontal / 180) * EnergyCostEyeProcessing;
         return energyConsumed;
