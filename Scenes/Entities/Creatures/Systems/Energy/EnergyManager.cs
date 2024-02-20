@@ -80,5 +80,10 @@ public class EnergyManager
         return energyConsumed;
     }
 
-
+    public void Reset()
+    {
+        CurrentEnergy = MaxEnergy;
+        TotalEnergySpend = 0;
+        TotalEnergyReplenished = 0;
+    }
 }

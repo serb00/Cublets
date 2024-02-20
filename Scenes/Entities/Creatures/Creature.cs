@@ -300,7 +300,7 @@ public partial class Creature : CharacterBody3D, IVisible
     {
         if (_energyManager.CurrentEnergy <= 0)
         {
-            QueueFree();
+            DisableCharacter();
             return;
         }
 
@@ -363,6 +363,26 @@ public partial class Creature : CharacterBody3D, IVisible
                 )
             );
         }
+    }
+
+    public void DisableCharacter()
+    {
+        SetProcess(false);
+        SetPhysicsProcess(false);
+        Hide();
+        CollisionLayer = 0; // Disables collision layer 2 for the object itself
+        CollisionMask = 0; // Disables collision layers 1 and 2 for detection
+    }
+
+    public void EnableCharacter(Vector3 position)
+    {
+        SetProcess(true);
+        SetPhysicsProcess(true);
+        Show();
+        CollisionLayer = 1 << 1; // Enables layer 2 for the object itself
+        CollisionMask = 1 | (1 << 1); // Enables layers 1 and 2 for detection
+        Position = position;
+        _energyManager.Reset();
     }
 
     #endregion Logic

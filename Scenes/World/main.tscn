@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://dc55xmbtnwgx3"]
+[gd_scene load_steps=19 format=3 uid="uid://dc55xmbtnwgx3"]
 
 [ext_resource type="Script" path="res://Scenes/World/Main.cs" id="1_wxmxv"]
 [ext_resource type="PackedScene" uid="uid://3ja6th6yxf8r" path="res://Scenes/Entities/Food/food.tscn" id="3_55uh5"]
@@ -25,15 +25,9 @@ size = Vector3(60, 2, 60)
 [sub_resource type="BoxShape3D" id="BoxShape3D_w7i2v"]
 size = Vector3(1, 5, 60)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cf84i"]
-albedo_color = Color(1, 0, 1, 1)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_pungr"]
-material = SubResource("StandardMaterial3D_cf84i")
-
 [sub_resource type="Curve3D" id="Curve3D_2fdto"]
 _data = {
-"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -13.1373, 0.0391846, -14.7545, 0, 0, 0, 0, 0, 0, 13.6407, 0.0379639, -14.545, 0, 0, 0, 0, 0, 0, 13.3912, -0.0396729, 14.9629, 0.0710907, -0.105195, 0.230877, -0.0710907, 0.105195, -0.230877, -13.0565, -0.039917, 15.3352, 0, 0, 0, 0, 0, 0, -13.1373, 0.0391846, -14.7545),
+"points": PackedVector3Array(0, 0, 0, 0, 0, 0, -50, 2.08165e-12, -50, 0, 0, 0, 0, 0, 0, 50, 2.08165e-12, -50, 0, 0, 0, 0, 0, 0, 50, 2.08165e-12, 50, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, -50, 2.08165e-12, 50, 0, 0, 0, 0, 0, 0, -50, 2.08165e-12, -50),
 "tilts": PackedFloat32Array(0, 0, 0, 0, 0)
 }
 point_count = 5
@@ -54,7 +48,8 @@ script = ExtResource("5_c2w18")
 
 [node name="SimulationParameters" type="Node" parent="GameManager/SimulationManager"]
 script = ExtResource("5_2lmqp")
-TimePerGenerationSeconds = 5
+InitialPopulationSize = 50
+TimePerGenerationSeconds = 10
 MaxGenerations = 3
 
 [node name="Level" type="Node" parent="."]
@@ -65,13 +60,15 @@ collision_layer = 4
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Ground"]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 2.08165e-12, -2, 2.08165e-12)
 shape = SubResource("BoxShape3D_iwul3")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Level/Ground"]
+transform = Transform3D(3.00198, 0, 0, 0, 1, 0, 0, 0, 3.00254, 0, 0, 0)
 mesh = SubResource("BoxMesh_qrpi6")
 
 [node name="Wall" type="StaticBody3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0.531258, 2.08165e-12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 3, -90, 0.531, 2.08165e-12)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Level/Wall"]
 transform = Transform3D(1, 0, 0, 0, 5, 0, 0, 0, 60, 0, 0, 2.08165e-12)
@@ -82,7 +79,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.0
 shape = SubResource("BoxShape3D_w7i2v")
 
 [node name="Wall2" type="StaticBody3D" parent="Level"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0.531258, 2.08165e-12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 3, 90, 0.531, 2.08165e-12)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Level/Wall2"]
 transform = Transform3D(1, 0, 0, 0, 5, 0, 0, 0, 60, 0, 0, 2.08165e-12)
@@ -92,25 +89,25 @@ mesh = SubResource("BoxMesh_70ysy")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.08165e-12)
 shape = SubResource("BoxShape3D_w7i2v")
 
-[node name="Wall3" type="StaticBody3D" parent="Level"]
-transform = Transform3D(-4.37114e-08, 3.48787e-16, 1, 3.48787e-16, 1, -3.48787e-16, -1, 3.48787e-16, -4.37114e-08, 2.08165e-12, 0.531258, -30)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Level/Wall3"]
-transform = Transform3D(1, 0, 0, 0, 5, 0, 0, 0, 60, 0, 0, 2.08165e-12)
-mesh = SubResource("BoxMesh_70ysy")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.08165e-12)
-shape = SubResource("BoxShape3D_w7i2v")
-
 [node name="Wall4" type="StaticBody3D" parent="Level"]
-transform = Transform3D(-4.37114e-08, 3.48787e-16, 1, 3.48787e-16, 1, -3.48787e-16, -1, 3.48787e-16, -4.37114e-08, 2.08165e-12, 0.531258, 30)
+transform = Transform3D(-4.37114e-08, 3.48787e-16, 3, 3.48787e-16, 1, -1.04636e-15, -1, 3.48787e-16, -1.31134e-07, 2.08165e-12, 0.531, 90)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Level/Wall4"]
 transform = Transform3D(1, 0, 0, 0, 5, 0, 0, 0, 60, 0, 0, 2.08165e-12)
 mesh = SubResource("BoxMesh_70ysy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.08165e-12)
+shape = SubResource("BoxShape3D_w7i2v")
+
+[node name="Wall5" type="StaticBody3D" parent="Level"]
+transform = Transform3D(-4.37114e-08, 3.48787e-16, 3, 3.48787e-16, 1, -1.04636e-15, -1, 3.48787e-16, -1.31134e-07, 2.08165e-12, 0.531, -90)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Level/Wall5"]
+transform = Transform3D(1, 0, 0, 0, 5, 0, 0, 0, 60, 0, 0, 2.08165e-12)
+mesh = SubResource("BoxMesh_70ysy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Wall5"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.08165e-12)
 shape = SubResource("BoxShape3D_w7i2v")
 
@@ -142,31 +139,12 @@ autostart = true
 [node name="CreatureTimer" type="Timer" parent="Creatures"]
 wait_time = 2.0
 
-[node name="Cylinders" type="Node3D" parent="Creatures"]
-visible = false
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Creatures/Cylinders"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.1676, 0, -14.8024)
-mesh = SubResource("CylinderMesh_pungr")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="Creatures/Cylinders"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.1676, 0, 15.1976)
-mesh = SubResource("CylinderMesh_pungr")
-
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="Creatures/Cylinders"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.3435, -0.0266113, 14.7981)
-mesh = SubResource("CylinderMesh_pungr")
-
-[node name="MeshInstance3D4" type="MeshInstance3D" parent="Creatures/Cylinders"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.6892, 0.95874, -14.7911)
-mesh = SubResource("CylinderMesh_pungr")
-
 [node name="SpawnPath" type="Path3D" parent="Creatures"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 0.1, 2.08165e-12)
 curve = SubResource("Curve3D_2fdto")
 
 [node name="SpawnLocation" type="PathFollow3D" parent="Creatures/SpawnPath"]
-transform = Transform3D(-0.00782331, 4.55831e-05, -0.999969, -1.81899e-12, 1, 4.55845e-05, 0.999969, 3.56624e-07, -0.00782331, -13.1373, 0.0391846, -14.7545)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -50, 2.08165e-12, -50)
 
 [node name="Panel" type="Panel" parent="." node_paths=PackedStringArray("_energyLabel", "_creatureLabel")]
 offset_right = 558.0
