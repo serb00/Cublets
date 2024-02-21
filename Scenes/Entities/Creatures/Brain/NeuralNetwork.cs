@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Godot;
 
 /// <summary>
@@ -41,6 +39,10 @@ public class NeuralNetwork
         InitializeNetwork(neuronsMap);
     }
 
+    /// <summary>
+    /// Initializes the neural network by creating neurons and connections between them based on the specified neurons map.
+    /// </summary>
+    /// <param name="neuronsMap">Holds information about neurons</param>
     private void InitializeNetwork(List<NeuronsMapItem> neuronsMap)
     {
         // Create Neurons
@@ -54,6 +56,11 @@ public class NeuralNetwork
         CreatePartialForwardConnections(neuronsMap);
     }
 
+    /// <summary>
+    /// Creates partial forward connections between neurons in the neural network.
+    /// It connects each neuron in a layer to a random subset of neurons from the previous layer.
+    /// </summary>
+    /// <param name="neuronsMap"></param>
     private void CreatePartialForwardConnections(List<NeuronsMapItem> neuronsMap)
     {
         int maxLayer = neuronsMap.Max(x => x.Layer);
@@ -72,6 +79,11 @@ public class NeuralNetwork
         }
     }
 
+    /// <summary>
+    /// Creates full forward connections between neurons in the neural network.
+    /// It connects each neuron in a layer to all neurons in the previous layer.
+    /// </summary>
+    /// <param name="neuronsMap"></param>
     private void CreateFullForwardConnections(List<NeuronsMapItem> neuronsMap)
     {
         int maxLayer = neuronsMap.Max(x => x.Layer);
@@ -111,11 +123,6 @@ public class NeuralNetwork
     }
 
     #endregion Initialization
-
-    #region JSONDesserialization
-
-
-    #endregion JSONDesserialization
 
     #region Logic
 

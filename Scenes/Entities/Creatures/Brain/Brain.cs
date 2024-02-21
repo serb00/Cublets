@@ -66,7 +66,7 @@ public class Brain
                 switch (item.BodyPartLink.Type)
                 {
                     case BodyPartType.Mouth:
-                        NeuronsMap.Add(new NeuronsMapItem(idx++, BrainZoneType.Movement, NeuronActivationFunction.BinaryStep, item.BodyPartLink, outputLayerIndex));
+                        NeuronsMap.Add(new NeuronsMapItem(idx++, item.Type, NeuronActivationFunction.BinaryStep, item.BodyPartLink, outputLayerIndex));
                         break;
                     default:
                         GD.Print("Unknown body part type in Brain.MapOutputNeurons method");
