@@ -43,31 +43,4 @@ public static class DNASerializer
         float result = BitConverter.ToSingle(bytes, 0);
         return result;
     }
-
-    public static string EncodeDNA(DNA dna)
-    {
-        try
-        {
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            return JsonSerializer.Serialize(dna, options);
-        }
-        catch (Exception ex)
-        {
-            GD.PrintErr("Failed to encode DNA: ", ex.Message);
-            return string.Empty;
-        }
-    }
-
-    public static DNA DecodeDNA(string dnaString)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize<DNA>(dnaString);
-        }
-        catch (Exception ex)
-        {
-            GD.PrintErr("Failed to decode DNA: ", ex.Message);
-            return null;
-        }
-    }
 }
