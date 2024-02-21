@@ -1,10 +1,10 @@
 public struct NeuronsMapItem
 {
-    public readonly int ID;
-    public readonly BrainZoneType Type;
-    public readonly NeuronActivationFunction ActivationFunction;
-    public readonly BodyPart BodyPartLink;
-    public readonly int Layer;
+    public int ID { get; set; }
+    public BrainZoneType Type { get; set; }
+    public NeuronActivationFunction ActivationFunction { get; set; }
+    // public BodyPart BodyPartLink { get; set; }
+    public int Layer { get; set; }
 
     public NeuronsMapItem(
         int id, BrainZoneType type,
@@ -14,7 +14,7 @@ public struct NeuronsMapItem
         ID = id;
         Type = type;
         ActivationFunction = activationFunction;
-        BodyPartLink = bodyPartLink;
+        // BodyPartLink = bodyPartLink;
         Layer = layer;
     }
 }

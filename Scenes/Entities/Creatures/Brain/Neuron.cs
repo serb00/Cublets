@@ -7,14 +7,9 @@ using Godot;
 public class Neuron
 {
     /// <summary>
-    /// The list of connections associated with this neuron.
-    /// </summary>
-    public List<Connection> Connections { get; set; }
-
-    /// <summary>
     /// The output value of the neuron.
     /// </summary>
-    public float OutputValue { get; private set; }
+    public float OutputValue { get; set; }
 
     /// <summary>
     /// The ID of the neuron.
@@ -29,38 +24,26 @@ public class Neuron
     /// <summary>
     /// The bias value of the neuron.
     /// </summary>
-    readonly float _bias;
+    public float Bias { get; set; }
+
+    /// <summary>
+    /// Empty constructor. For JSON deserialization.
+    /// </summary>
+    public Neuron() { }
 
     public Neuron(int id, NeuronActivationFunction? activationFunction = null)
     {
-        Connections = new List<Connection>();
         ID = id;
         OutputValue = (float)GD.RandRange(-1f, 1f);
-        _bias = (float)GD.RandRange(-1f, 1f);
+        Bias = (float)GD.RandRange(-1f, 1f);
         // if activationFunction is not specified, use a random one
         ActivationFunction = activationFunction ?? Utils.GetRandomEnumValue<NeuronActivationFunction>();
-    }
-
-
-    /// <summary>
-    /// Calculates the output value of the neuron based on the input connections and weights.
-    /// </summary>
-    public void CalculateOutput()
-    {
-        float tempValue = 0f;
-        foreach (var conn in Connections)
-        {
-            tempValue += conn.SourceNeuron.OutputValue * conn.Weight;
-        }
-        OutputValue = Utils.ScaleValue(tempValue + _bias, -Connections.Count - 1, Connections.Count + 1);
-
-        Activate();
     }
 
     /// <summary>
     /// Activates the neuron based on the specified activation function.
     /// </summary>
-    private void Activate()
+    public void Activate()
     {
         switch (ActivationFunction)
         {

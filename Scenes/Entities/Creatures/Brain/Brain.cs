@@ -7,23 +7,30 @@ public class Brain
 {
 
     #region Attributes
-    private NeuralNetwork NeuralNetwork { get; set; }
+    public NeuralNetwork NeuralNetwork { get; set; }
     public int NumInputNeurons { get; set; }
     public int NumOutputNeurons { get; set; }
     public int NumTotalNeurons { get; set; }
-    public List<NeuronsMapItem> NeuronsMap { get; set; } = new();
+    public int SignalPasses { get; set; }
+    public List<NeuronsMapItem> NeuronsMap { get; set; }
 
-    private Dictionary<int, Action> outputMappings = new();
+    public Dictionary<int, Action> OutputMappings { get; set; }
 
     #endregion Attributes
 
     #region Constructors
+
+    /// <summary>
+    /// Empty constructor. For JSON deserialization.
+    /// </summary>
+    public Brain() { }
 
     public void Initialize(
         List<BrainZone> inputNeuronsList,
         List<BrainZone> outputNeuronsList,
         int brainHiddenLayers, int signalPasses, Creature creature)
     {
+        SignalPasses = signalPasses;
         NumInputNeurons = inputNeuronsList.Sum(x => x.NeuronsCount);
         NumOutputNeurons = outputNeuronsList.Sum(x => x.NeuronsCount);
         int[] NumHiddenNeurons = new int[brainHiddenLayers];
@@ -32,14 +39,15 @@ public class Brain
             NumHiddenNeurons[i] += GD.RandRange(NumInputNeurons, NumInputNeurons + NumOutputNeurons);
         }
         NumTotalNeurons = NumInputNeurons + NumOutputNeurons + NumHiddenNeurons.Sum();
+        NeuronsMap = new();
         int lastIndex = MapInputNeurons(inputNeuronsList);
         lastIndex = MapHiddenNeurons(NumHiddenNeurons, lastIndex);
         MapOutputNeurons(outputNeuronsList, brainHiddenLayers + 1, lastIndex);
 
         NeuralNetwork = new NeuralNetwork(NeuronsMap, signalPasses);
 
-        creature._energyManager.AdjustMaxEnergy(NumTotalNeurons * NeuralNetwork.NeuronConnections * 10);
-        outputMappings = new();
+        creature._energyManager.AdjustMaxEnergy(NumTotalNeurons * NeuralNetwork.NeuronConnections.Count * 10);
+        OutputMappings = new();
         InitializeMappings();
     }
 
@@ -126,7 +134,7 @@ public class Brain
         // Initialize inputMappings and outputMappings
         for (int i = 0; i < NumOutputNeurons; i++)
         {
-            outputMappings[i] = new Action(i);
+            OutputMappings[i] = new Action(i);
         }
     }
 
@@ -145,7 +153,7 @@ public class Brain
         for (int i = 0; i < NumOutputNeurons; i++)
         {
             int outputIndex = NeuralNetwork.Neurons.Count - NumOutputNeurons + i;
-            outputMappings[i].Execute(NeuralNetwork.Neurons[outputIndex].OutputValue);
+            OutputMappings[i].Execute(NeuralNetwork.Neurons[outputIndex].OutputValue);
         }
     }
 
@@ -156,6 +164,11 @@ public class Brain
     public IEnumerable<Neuron> GetAllNeurons()
     {
         return NeuralNetwork.Neurons;
+    }
+
+    public IEnumerable<NeuronConnection> GetAllNeuronConnections()
+    {
+        return NeuralNetwork.NeuronConnections;
     }
 
     public int NeuronsCount()
@@ -173,11 +186,6 @@ public class Brain
         NeuralNetwork.SetNeuronValue(index, val);
     }
 
-    public int ConnectionsCount()
-    {
-        return NeuralNetwork.NeuronConnections;
-    }
-
     #endregion NeuronHelpers
 
     #region NetworkHelpers
@@ -189,7 +197,7 @@ public class Brain
 
     public int GetNeuronConnectionsCount()
     {
-        return NeuralNetwork.NeuronConnections;
+        return NeuralNetwork.NeuronConnections.Count;
     }
 
     public int GetNeuronsCount()
@@ -221,8 +229,13 @@ public class Sensor
 
 public class Action
 {
-    readonly int ID;
-    readonly Delegate action;
+    public int ID { get; set; }
+    public Delegate action { get; set; }
+
+    /// <summary>
+    /// Empty constructor. For JSON deserialization.
+    /// </summary>
+    public Action() { }
     public Action(int i, Delegate delegateAction = null)
     {
         ID = i;

@@ -8,6 +8,8 @@ public partial class GameManager : Node
 	UIPanel _panel;
 	Creature selectedCreature;
 
+	string tempString;
+
 	public override void _Ready()
 	{
 		base._Ready();
@@ -61,11 +63,24 @@ public partial class GameManager : Node
 		}
 		if (Input.IsActionJustPressed("Action1"))
 		{
-
+			if (selectedCreature == null)
+			{
+				GD.Print("No creature selected to copy the brain.");
+				return;
+			}
+			tempString = Utils.EncodeObject(selectedCreature.GetBrain());
+			GD.Print("Brain encoded and copied.");
 		}
 		if (Input.IsActionJustPressed("Action2"))
 		{
-
+			if (tempString == null)
+			{
+				GD.Print("No brain to paste.");
+				return;
+			}
+			var brain = Utils.DecodeObject<Brain>(tempString);
+			selectedCreature.SetBrain(brain);
+			GD.Print($"Brain of {selectedCreature.Name} changed from a copy.");
 		}
 		if (Input.IsActionJustPressed("Action3"))
 		{

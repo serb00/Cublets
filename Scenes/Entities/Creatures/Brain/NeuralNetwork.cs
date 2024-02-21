@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Godot;
 
 /// <summary>
@@ -13,25 +14,30 @@ public class NeuralNetwork
     /// <summary>
     /// Stores the list of neurons in the neural network.
     /// </summary>
-    public List<Neuron> Neurons { get; private set; }
+    public List<Neuron> Neurons { get; set; }
     /// <summary>
-    /// Stores the number of connections for all neurons in the neural network.
+    /// Stores the connections for all neurons in the neural network.
     /// </summary>
-    public int NeuronConnections { get; private set; }
+    public List<NeuronConnection> NeuronConnections { get; set; }
     /// <summary>
     /// Stores the number of signal passes in the neural network per network update.
     /// </summary>
-    public int SignalPasses { get; private set; }
+    public int SignalPasses { get; set; }
 
     #endregion Attributes
 
     #region Initialization
 
+    /// <summary>
+    /// Empty constructor. For JSON deserialization.
+    /// </summary>
+    public NeuralNetwork() { }
+
     public NeuralNetwork(List<NeuronsMapItem> neuronsMap, int signalPasses)
     {
         Neurons = new List<Neuron>();
+        NeuronConnections = new List<NeuronConnection>();
         SignalPasses = signalPasses;
-        NeuronConnections = 0;
         InitializeNetwork(neuronsMap);
     }
 
@@ -53,14 +59,14 @@ public class NeuralNetwork
         int maxLayer = neuronsMap.Max(x => x.Layer);
         for (int currentLayer = 0; currentLayer <= maxLayer; currentLayer++)
         {
-            neuronsMap.FindAll(x => x.Layer == currentLayer).ForEach(toNeuron =>
+            neuronsMap.FindAll(x => x.Layer == currentLayer).ForEach(fromNeuron =>
             {
                 int neuronsOnLevel = neuronsMap.FindAll(x => x.Layer == currentLayer + 1).Count;
                 var selectedNeurons = neuronsMap.FindAll(x => x.Layer == currentLayer + 1).Take(GD.RandRange(1, neuronsOnLevel));
-                foreach (var fromNeuron in selectedNeurons)
+                foreach (var toNeuron in selectedNeurons)
                 {
-                    Neurons[toNeuron.ID].Connections.Add(new Connection(Neurons[fromNeuron.ID], Neurons[toNeuron.ID], (float)GD.RandRange(-1f, 1f)));
-                    NeuronConnections++;
+                    //Neurons[toNeuron.ID].Connections.Add(new Connection(Neurons[fromNeuron.ID], Neurons[toNeuron.ID], (float)GD.RandRange(-1f, 1f)));
+                    NeuronConnections.Add(new NeuronConnection(fromNeuron.ID, toNeuron.ID, (float)GD.RandRange(-1f, 1f)));
                 }
             });
         }
@@ -72,12 +78,12 @@ public class NeuralNetwork
 
         for (int currentLayer = 1; currentLayer <= maxLayer; currentLayer++)
         {
-            neuronsMap.FindAll(x => x.Layer == currentLayer).ForEach(toNeuron =>
+            neuronsMap.FindAll(x => x.Layer == currentLayer).ForEach(fromNeuron =>
             {
-                neuronsMap.FindAll(x => x.Layer == currentLayer - 1).ForEach(fromNeuron =>
+                neuronsMap.FindAll(x => x.Layer == currentLayer - 1).ForEach(toNeuron =>
                 {
-                    Neurons[fromNeuron.ID].Connections.Add(new Connection(Neurons[fromNeuron.ID], Neurons[toNeuron.ID], (float)GD.RandRange(-1f, 1f)));
-                    NeuronConnections++;
+                    // Neurons[fromNeuron.ID].Connections.Add(new Connection(Neurons[fromNeuron.ID], Neurons[toNeuron.ID], (float)GD.RandRange(-1f, 1f)));
+                    NeuronConnections.Add(new NeuronConnection(fromNeuron.ID, toNeuron.ID, (float)GD.RandRange(-1f, 1f)));
                 });
             });
         }
@@ -98,13 +104,18 @@ public class NeuralNetwork
             {
                 var targetNeuron = Neurons[GD.RandRange(0, Neurons.Count - 1)];
                 var weight = (float)GD.RandRange(-1f, 1f); // Random weight between -1 and 1
-                neuron.Connections.Add(new Connection(neuron, targetNeuron, weight));
+                // neuron.Connections.Add(new Connection(neuron, targetNeuron, weight));
+                NeuronConnections.Add(new NeuronConnection(neuron.ID, targetNeuron.ID, weight));
             }
-            NeuronConnections += numConnections;
         }
     }
 
     #endregion Initialization
+
+    #region JSONDesserialization
+
+
+    #endregion JSONDesserialization
 
     #region Logic
 
@@ -117,7 +128,16 @@ public class NeuralNetwork
         {
             foreach (var neuron in Neurons)
             {
-                neuron.CalculateOutput();
+                // neuron.CalculateOutput();
+                var connections = NeuronConnections.Where(x => x.TargetNeuronID == neuron.ID);
+                float tempValue = neuron.OutputValue;
+                foreach (var conn in connections)
+                {
+                    tempValue += Neurons[conn.SourceNeuronID].OutputValue * conn.Weight;
+                }
+                neuron.OutputValue = Utils.ScaleValue(tempValue + neuron.Bias, -connections.Count() - 1, connections.Count() + 1);
+
+                neuron.Activate();
             }
         }
     }

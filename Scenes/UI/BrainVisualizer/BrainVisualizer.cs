@@ -72,20 +72,17 @@ public partial class BrainVisualizer : Panel
 
 
 		// Instantiate and setup connections
-		foreach (var neuron in BrainInstance.GetAllNeurons())
+		foreach (var connection in BrainInstance.GetAllNeuronConnections())
 		{
-			foreach (var connection in neuron.Connections)
+			if (connection.SourceNeuronID == connection.TargetNeuronID)
 			{
-				if (connection.SourceNeuron == connection.TargetNeuron)
-				{
-					// Create a self-connection
-					CreateSelfConnection(neuron, connection.Weight);
-				}
-				else
-				{
-					// Create a linear connection
-					CreateLinearConnection(connection);
-				}
+				// Create a self-connection
+				CreateSelfConnection(connection.TargetNeuronID, connection.Weight);
+			}
+			else
+			{
+				// Create a linear connection
+				CreateLinearConnection(connection);
 			}
 		}
 	}
@@ -133,14 +130,14 @@ public partial class BrainVisualizer : Panel
 	#endregion Logic
 
 	#region DrawingConnections
-	private void CreateLinearConnection(Connection connection)
+	private void CreateLinearConnection(NeuronConnection connection)
 	{
 		//TODO: fix
-		var sourcePos = neuronNodes[connection.SourceNeuron.ID].Position;
-		var targetPos = neuronNodes[connection.TargetNeuron.ID].Position;
+		var sourcePos = neuronNodes[connection.SourceNeuronID].Position;
+		var targetPos = neuronNodes[connection.TargetNeuronID].Position;
 
 		var connectionNode = ConnectionScene.Instantiate<TextureRect>();
-		connectionNode.Name = $"Connection {connection.SourceNeuron.ID} -> {connection.TargetNeuron.ID}";
+		connectionNode.Name = $"Connection {connection.SourceNeuronID} -> {connection.TargetNeuronID}";
 		if (connection.Weight < 0)
 		{
 			// If weight is between -1 and 0, interpolate between red and white
@@ -168,12 +165,12 @@ public partial class BrainVisualizer : Panel
 		AddChild(connectionNode);
 	}
 
-	private void CreateSelfConnection(Neuron neuron, float weight)
+	private void CreateSelfConnection(int neuronID, float weight)
 	{
-		var neuronPos = neuronNodes[neuron.ID].Position;
+		var neuronPos = neuronNodes[neuronID].Position;
 
 		var selfConnectionNode = SelfConnectionScene.Instantiate<TextureRect>();
-		selfConnectionNode.Name = string.Format("Self Connection {0}", neuron.ID);
+		selfConnectionNode.Name = string.Format("Self Connection {0}", neuronID);
 		if (weight < 0)
 		{
 			// If weight is between -1 and 0, interpolate between red and white

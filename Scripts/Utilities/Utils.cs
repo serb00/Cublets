@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 public static class Utils
 {
@@ -62,6 +64,49 @@ public static class Utils
         else
         {
             return scaledValue;
+        }
+    }
+
+    public static string EncodeObject<T>(T obj)
+    {
+        try
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                IncludeFields = true,
+                Converters = { new JsonStringEnumConverter() },
+                PropertyNameCaseInsensitive = true
+            };
+            return JsonSerializer.Serialize(obj, options);
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr("Failed to encode object: ", ex.Message);
+            return string.Empty;
+        }
+    }
+
+    public static T DecodeObject<T>(string objString)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<T>(
+                objString,
+                new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                    IncludeFields = true,
+                    Converters = { new JsonStringEnumConverter() },
+                    PropertyNameCaseInsensitive = true
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr("Failed to decode object: ", ex.Message);
+            return default;
         }
     }
 }

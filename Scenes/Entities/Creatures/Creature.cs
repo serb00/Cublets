@@ -17,7 +17,7 @@ public partial class Creature : CharacterBody3D, IVisible
     #region Parameters
 
     double updateBrainIntervalSeconds = 0.5;
-    double secondsSinceLastBrainUpdate = 0;
+    double secondsSinceLastBrainUpdate = 1; // so the brain updates on the first frame
     [Export] int minHiddenLayers = 0;
     [Export] int maxHiddenLayers = 2;
 
@@ -29,7 +29,7 @@ public partial class Creature : CharacterBody3D, IVisible
 
     #region Attributes
 
-    readonly Brain _brain = new();
+    Brain _brain = new();
     Body _body;
     public EnergyManager _energyManager;
     public DNA _dna;
@@ -293,6 +293,16 @@ public partial class Creature : CharacterBody3D, IVisible
     }
 
     #endregion Getters
+
+    #region Setters
+
+    public void SetBrain(Brain brain)
+    {
+        _brain = brain;
+    }
+
+    #endregion Setters
+
 
     #region Logic
 
