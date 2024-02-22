@@ -8,9 +8,9 @@ public class EnergyManager
     public float TotalEnergySpend { get; private set; } = 0;
     public float TotalEnergyReplenished { get; private set; } = 0;
     private readonly float EnergyCostMovement = 1;
-    private readonly float EnergyCostRotation = 1;
-    private readonly float EnergyCostBrainProcessing = 0.5f;
-    private readonly float EnergyCostEyeProcessing = 0.5f;
+    private readonly float EnergyCostRotation = 0.5f;
+    private readonly float EnergyCostBrainProcessing = 0.2f;
+    private readonly float EnergyCostEyeProcessing = 0.1f;
 
     public EnergyManager(float maxEnergy, float size)
     {
