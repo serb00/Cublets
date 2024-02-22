@@ -90,28 +90,7 @@ public partial class SimulationManager : Node
         // TODO: Implement creature generation based on your parameters
         if (dna == null)
         {
-            DNA.BodyGenes bodyGene = new()
-            {
-                ID = 1,
-                Type = BodyPartType.Body,
-                Size = 1.0f,
-            };
-            DNA.BrainGenes brainGene = new() { Complexity = 1, NumLayers = 1 };
-            List<DNA.EyeGenes> eyesGene = new() {
-                new() { ID = 1, Angle = new(0, 0.5f, -1) }
-                // , new() { ID = 2, Angle = new(-1, 0.25f, 0) }
-            };
-            List<DNA.MouthGenes> mouthsGene = new() {
-                new() { ID = 1, Angle = new(0, -0.5f, -1) }
-            };
-
-            dna = new DNA(
-                EntityType.Creature,
-                bodyGene,
-                brainGene,
-                eyesGene,
-                mouthsGene
-            );
+            dna = CreateNewDNA();
         }
 
         PackedScene creatureScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Creature.tscn");
@@ -198,6 +177,37 @@ public partial class SimulationManager : Node
     {
         // TODO: Implement randomization of brain
         return GenerateCreature(); // Placeholder
+    }
+
+    private DNA CreateNewDNA()
+    {
+        DNA.BodyGenes bodyGene = new()
+        {
+            ID = 1,
+            Type = BodyPartType.Body,
+            Size = (float)GD.RandRange(0.5f, 2f),
+        };
+        DNA.BrainGenes brainGene = new()
+        {
+            NumHiddenLayers = GD.RandRange(0, 5),
+            SignalPasses = 1,
+            ConnectionsMethod = Utils.GetRandomEnumValue<NNConnectionsMethod>()
+        };
+        List<DNA.EyeGenes> eyesGene = new() {
+                new() { ID = 1, Angle = new(0, 0.5f, -1) }
+                //, new() { ID = 2, Angle = new(-1, 0.25f, 0) }
+            };
+        List<DNA.MouthGenes> mouthsGene = new() {
+                new() { ID = 1, Angle = new(0, -0.5f, -1) }
+            };
+
+        return new DNA(
+            EntityType.Creature,
+            bodyGene,
+            brainGene,
+            eyesGene,
+            mouthsGene
+        );
     }
 
     public override void _PhysicsProcess(double delta)

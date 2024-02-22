@@ -48,7 +48,6 @@ script = ExtResource("5_c2w18")
 
 [node name="SimulationParameters" type="Node" parent="GameManager/SimulationManager"]
 script = ExtResource("5_2lmqp")
-TimePerGenerationSeconds = 100
 
 [node name="Level" type="Node" parent="."]
 

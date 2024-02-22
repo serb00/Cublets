@@ -31,29 +31,42 @@ public class NeuralNetwork
     /// </summary>
     public NeuralNetwork() { }
 
-    public NeuralNetwork(List<NeuronsMapItem> neuronsMap, int signalPasses)
+    public NeuralNetwork(List<NeuronsMapItem> neuronsMap, int signalPasses, NNConnectionsMethod connectionsMethod)
     {
         Neurons = new List<Neuron>();
         NeuronConnections = new List<NeuronConnection>();
         SignalPasses = signalPasses;
-        InitializeNetwork(neuronsMap);
+        InitializeNetwork(neuronsMap, connectionsMethod);
     }
 
     /// <summary>
     /// Initializes the neural network by creating neurons and connections between them based on the specified neurons map.
     /// </summary>
     /// <param name="neuronsMap">Holds information about neurons</param>
-    private void InitializeNetwork(List<NeuronsMapItem> neuronsMap)
+    private void InitializeNetwork(List<NeuronsMapItem> neuronsMap, NNConnectionsMethod connectionsMethod)
     {
         // Create Neurons
         foreach (var neuron in neuronsMap)
         {
             Neurons.Add(new Neuron(neuron.ID, neuron.ActivationFunction));
         }
+        int maxLayer = neuronsMap.Max(x => x.Layer);
 
-        // CreateRandomConnections(minConnections, maxConnections);
-        //CreateFullForwardConnections(neuronsMap);
-        CreatePartialForwardConnections(neuronsMap);
+        switch (connectionsMethod)
+        {
+            case NNConnectionsMethod.Random:
+                CreateRandomConnections(0, maxLayer);
+                break;
+            case NNConnectionsMethod.Full:
+                CreateFullForwardConnections(neuronsMap);
+                break;
+            case NNConnectionsMethod.Partial:
+                CreatePartialForwardConnections(neuronsMap);
+                break;
+            default:
+                CreatePartialForwardConnections(neuronsMap);
+                break;
+        }
     }
 
     /// <summary>

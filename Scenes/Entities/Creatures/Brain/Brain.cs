@@ -28,7 +28,9 @@ public class Brain
     public void Initialize(
         List<BrainZone> inputNeuronsList,
         List<BrainZone> outputNeuronsList,
-        int brainHiddenLayers, int signalPasses, Creature creature)
+        int brainHiddenLayers, int signalPasses,
+        NNConnectionsMethod connectionsMethod,
+        Creature creature)
     {
         SignalPasses = signalPasses;
         NumInputNeurons = inputNeuronsList.Sum(x => x.NeuronsCount);
@@ -44,7 +46,7 @@ public class Brain
         lastIndex = MapHiddenNeurons(NumHiddenNeurons, lastIndex);
         MapOutputNeurons(outputNeuronsList, brainHiddenLayers + 1, lastIndex);
 
-        NeuralNetwork = new NeuralNetwork(NeuronsMap, signalPasses);
+        NeuralNetwork = new NeuralNetwork(NeuronsMap, signalPasses, connectionsMethod);
 
         creature._energyManager.AdjustMaxEnergy(NumTotalNeurons * NeuralNetwork.NeuronConnections.Count * 10);
         OutputMappings = new();

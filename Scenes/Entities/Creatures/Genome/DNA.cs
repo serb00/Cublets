@@ -3,6 +3,9 @@ using System.IO;
 using System.Text;
 using Godot;
 
+/// <summary>
+/// Class to store the DNA of an entity
+/// </summary>
 public class DNA
 {
     public struct BodyGenes
@@ -14,9 +17,9 @@ public class DNA
 
     public struct BrainGenes
     {
-        public int Complexity { get; set; }
-        public int NumLayers { get; set; }
+        public int NumHiddenLayers { get; set; }
         public int SignalPasses { get; set; }
+        public NNConnectionsMethod ConnectionsMethod { get; set; }
     }
 
     public struct EyeGenes

@@ -138,7 +138,7 @@ public partial class Creature : CharacterBody3D, IVisible
 
     }
 
-    private Eye CreateEye(PackedScene eyeScene, EyeData eyeData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
+    private static Eye CreateEye(PackedScene eyeScene, EyeData eyeData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
     {
         Eye eye = eyeScene.Instantiate() as Eye;
         eye.Name = $"Eye_{eye.GetInstanceId()}";
@@ -154,7 +154,7 @@ public partial class Creature : CharacterBody3D, IVisible
         return eye;
     }
 
-    private Mouth CreateMouth(PackedScene mouthScene, MouthData mouthData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
+    private static Mouth CreateMouth(PackedScene mouthScene, MouthData mouthData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
     {
         Mouth mouth = mouthScene.Instantiate() as Mouth;
         mouth.Name = $"Mouth_{mouth.GetInstanceId()}";
@@ -169,14 +169,19 @@ public partial class Creature : CharacterBody3D, IVisible
 
     private void InitializeBrain()
     {
-
-        _brain.Initialize(InputNeuronsList, OutputNeuronsList, GD.RandRange(minHiddenLayers, maxHiddenLayers), 1, this);
+        _brain.Initialize(
+            InputNeuronsList,
+            OutputNeuronsList,
+            _dna.BrainGene.NumHiddenLayers,
+            _dna.BrainGene.SignalPasses,
+            _dna.BrainGene.ConnectionsMethod,
+            this);
     }
 
     private void InitializeBodyParts()
     {
 
-        string tempString = (string)_body.GetShape().ToString();
+        string tempString = _body.GetShape().ToString();
         string shapeName = tempString.Substring(1, tempString.Find("Shape3D") - 1);
 
         switch (shapeName)
@@ -198,7 +203,7 @@ public partial class Creature : CharacterBody3D, IVisible
         }
     }
 
-    private Vector3 GetBoxShapeBodyPartPosition(Vector3 angle, Vector3 cubeScale)
+    private static Vector3 GetBoxShapeBodyPartPosition(Vector3 angle, Vector3 cubeScale)
     {
         // Step 1: Normalize the angle vector
         Vector3 direction = angle.Normalized();
@@ -242,7 +247,7 @@ public partial class Creature : CharacterBody3D, IVisible
         }
     }
 
-    private Vector3 GetBoxShapeBodyPartRotation(Vector3 angle, Vector3 cubeScale)
+    private static Vector3 GetBoxShapeBodyPartRotation(Vector3 angle, Vector3 cubeScale)
     {
         // Step 1: Normalize the angle vector
         Vector3 direction = angle.Normalized();

@@ -131,3 +131,22 @@ public enum BrainZoneType
     Consumption,
     Internal
 }
+
+/// <summary>
+/// Represents the different methods of connecting neurons in a neural network.
+/// </summary>
+public enum NNConnectionsMethod
+{
+    /// <summary>
+    /// Connects every neuron to every neuron from the previous layer.
+    /// </summary>
+    Full,
+    /// <summary>
+    /// Connects every neuron to some neurons from the previous layer.
+    /// </summary>
+    Partial,
+    /// <summary>
+    /// Connects neurons randomly based on 
+    /// </summary>
+    Random
+}
