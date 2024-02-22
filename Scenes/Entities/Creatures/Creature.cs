@@ -65,6 +65,7 @@ public partial class Creature : CharacterBody3D, IVisible
         _body = _bodyScene.Instantiate() as Body;
         _energyManager = new EnergyManager(0, _body.GetSize());
         var bodyData = (BodyData)ResourceLoader.Load(_bodyPartsCollection.GetBodyPartResourseOfTypeByIndex(_dna.BodyGene.Type, _dna.BodyGene.ID));
+        bodyData.Size = _dna.BodyGene.Size;
         _body.Initialize(this, bodyData);
         AddChild(_body);
         InitializeBodyParts();
@@ -141,6 +142,7 @@ public partial class Creature : CharacterBody3D, IVisible
         Eye eye = eyeScene.Instantiate() as Eye;
         eye.Name = $"Eye_{eye.GetInstanceId()}";
         eye.Angle = angle;
+        eye.Type = BodyPartType.Eye;
         eye._eyeData = eyeData;
         var neuronsNum = eye._eyeData.EyeComplexity * eye._eyeData.ActivatorPerEntity;
         eye._neuronInputIndexes = new int[neuronsNum];
@@ -156,6 +158,7 @@ public partial class Creature : CharacterBody3D, IVisible
     {
         Mouth mouth = mouthScene.Instantiate() as Mouth;
         mouth.Name = $"Mouth_{mouth.GetInstanceId()}";
+        mouth.Type = BodyPartType.Mouth;
         mouth.Angle = angle;
         mouth._mouthData = mouthData;
         mouth._neuronInputIndexes = new int[1];
@@ -186,7 +189,7 @@ public partial class Creature : CharacterBody3D, IVisible
 
             case "Box":
                 //_body.GetSize() / 2
-                ParentForBodyParts.Position = new Vector3(0, _body.GetSize() / 2, 0);
+                ParentForBodyParts.Position = new Vector3(0, _body.GetSize(), 0);
                 foreach (var part in _bodyParts)
                 {
                     ParentForBodyParts.AddChild(part);
@@ -203,13 +206,21 @@ public partial class Creature : CharacterBody3D, IVisible
     private static Vector3 GetBoxShapeBodyPartPosition(Vector3 angle, Vector3 cubeScale)
     {
         // Step 1: Normalize the angle vector
-        Vector3 direction = angle.Normalized();
+        // Vector3 direction = angle.Normalized();
+        // cubeScale *= 2;
 
         // Step 2: Adjust direction by inverse cube scale to identify face correctly
-        Vector3 adjustedDirection = new Vector3(
-            direction.X / cubeScale.X,
-            direction.Y / cubeScale.Y,
-            direction.Z / cubeScale.Z).Normalized();
+        // Vector3 adjustedDirection = new Vector3(
+        //     direction.X / cubeScale.X,
+        //     direction.Y / cubeScale.Y,
+        //     direction.Z / cubeScale.Z).Normalized();
+
+        Vector3 adjustedDirection = new
+            (
+            angle.X / cubeScale.X,
+            angle.Y / cubeScale.Y,
+            angle.Z / cubeScale.Z
+            );
 
 
 
@@ -217,29 +228,29 @@ public partial class Creature : CharacterBody3D, IVisible
         if (Math.Abs(adjustedDirection.X) > Math.Abs(adjustedDirection.Y) && Math.Abs(adjustedDirection.X) > Math.Abs(adjustedDirection.Z))
         {
             // Determine base position on Y-axis face
-            float baseX = Math.Sign(adjustedDirection.X) * cubeScale.X / 2;
+            float baseX = Math.Sign(adjustedDirection.X) * cubeScale.X;
             // Apply offset based on the X and Y components of the angle
-            float offsetY = adjustedDirection.Y * cubeScale.Y / 2;
-            float offsetZ = adjustedDirection.Z * cubeScale.Z / 2;
+            float offsetY = adjustedDirection.Y * cubeScale.Y;
+            float offsetZ = adjustedDirection.Z * cubeScale.Z;
             return new Vector3(baseX, offsetY, offsetZ);
 
         }
         else if (Math.Abs(adjustedDirection.Y) > Math.Abs(adjustedDirection.Z))
         {
             // Determine base position on Y-axis face
-            float baseY = Math.Sign(adjustedDirection.Y) * cubeScale.Y / 2;
+            float baseY = Math.Sign(adjustedDirection.Y) * cubeScale.Y;
             // Apply offset based on the X and Y components of the angle
-            float offsetX = adjustedDirection.X * cubeScale.X / 2;
-            float offsetZ = adjustedDirection.Z * cubeScale.Z / 2;
+            float offsetX = adjustedDirection.X * cubeScale.X;
+            float offsetZ = adjustedDirection.Z * cubeScale.Z;
             return new Vector3(offsetX, baseY, offsetZ);
         }
         else
         {
             // Determine base position on Z-axis face
-            float baseZ = Math.Sign(adjustedDirection.Z) * cubeScale.Z / 2;
+            float baseZ = Math.Sign(adjustedDirection.Z) * cubeScale.Z;
             // Apply offset based on the X and Y components of the angle
-            float offsetX = adjustedDirection.X * cubeScale.X / 2;
-            float offsetY = adjustedDirection.Y * cubeScale.Y / 2;
+            float offsetX = adjustedDirection.X * cubeScale.X;
+            float offsetY = adjustedDirection.Y * cubeScale.Y;
             return new Vector3(offsetX, offsetY, baseZ);
         }
     }
@@ -247,13 +258,13 @@ public partial class Creature : CharacterBody3D, IVisible
     private static Vector3 GetBoxShapeBodyPartRotation(Vector3 angle, Vector3 cubeScale)
     {
         // Step 1: Normalize the angle vector
-        Vector3 direction = angle.Normalized();
+        // Vector3 direction = angle.Normalized();
 
         // Step 2: Adjust direction by inverse cube scale to identify face correctly
         Vector3 adjustedDirection = new Vector3(
-            direction.X / cubeScale.X,
-            direction.Y / cubeScale.Y,
-            direction.Z / cubeScale.Z).Normalized();
+            angle.X / cubeScale.X,
+            angle.Y / cubeScale.Y,
+            angle.Z / cubeScale.Z);
 
         // Step 3: Find the predominant axis (largest absolute value in adjustedDirection)
         if (Math.Abs(adjustedDirection.X) > Math.Abs(adjustedDirection.Y) && Math.Abs(adjustedDirection.X) > Math.Abs(adjustedDirection.Z))

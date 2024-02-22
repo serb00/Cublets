@@ -185,18 +185,20 @@ public partial class SimulationManager : Node
         {
             ID = 1,
             Type = BodyPartType.Body,
-            Size = (float)GD.RandRange(0.5f, 2f),
+            // Size = (float)GD.RandRange(_parameters.MinCreatureSize, _parameters.MaxCreatureSize),
+            Size = 1,
         };
         DNA.BrainGenes brainGene = new()
         {
-            NumHiddenLayers = GD.RandRange(0, 5),
+            NumHiddenLayers = GD.RandRange(_parameters.MinBrainHiddenLayers, _parameters.MaxBrainHiddenLayers),
             ConnectionsMethod = Utils.GetRandomEnumValue<NNConnectionsMethod>()
         };
-        List<DNA.EyeGenes> eyesGene = new() {
-                new() { ID = 1, Angle = new(0, 0.5f, -1) }
-                , new() { ID = 3, Angle = new(-1, 0.25f, 0) }
-                , new() { ID = 3, Angle = new(1, 0.25f, 0) }
-            };
+        List<DNA.EyeGenes> eyesGene = new()
+        {
+            new() { ID = 1, Angle = new(0, 0.5f, -1) }
+            // , new() { ID = 3, Angle = new(-1, 0.25f, 0) }
+            //, new() { ID = 3, Angle = new(1, 0.25f, 0) }
+        };
         List<DNA.MouthGenes> mouthsGene = new() {
                 new() { ID = 1, Angle = new(0, -0.5f, -1) }
             };

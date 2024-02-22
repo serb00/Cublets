@@ -4,10 +4,10 @@
 [ext_resource type="Resource" uid="uid://dhbkakrbi5s00" path="res://Scenes/Entities/Creatures/Body_parts/Body/Bodies/Body_01.tres" id="2_p1ucl"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5262q"]
+size = Vector3(2, 2, 2)
 
-[node name="Body" type="CollisionShape3D" node_paths=PackedStringArray("_collisionShape3D")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 0.5, 2.08165e-12)
+[node name="CollisionShape" type="CollisionShape3D"]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 2.08165e-12, 0.5, 2.08165e-12)
 shape = SubResource("BoxShape3D_5262q")
 script = ExtResource("1_yhhij")
 _bodyData = ExtResource("2_p1ucl")
-_collisionShape3D = NodePath(".")
