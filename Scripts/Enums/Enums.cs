@@ -21,7 +21,7 @@ public enum BodyPartType
 {
     Eye,
     Mouth,
-    Ear,
+    Body,
     Nose,
     Tongue,
     Lip,

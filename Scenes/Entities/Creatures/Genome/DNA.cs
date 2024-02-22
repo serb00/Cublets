@@ -5,63 +5,64 @@ using Godot;
 
 public class DNA
 {
-    public struct BodyStruct
+    public struct BodyGenes
     {
         public int ID { get; set; }
-        public string Type { get; set; }
+        public BodyPartType Type { get; set; }
         public float Size { get; set; }
     }
 
-    public struct BrainStruct
+    public struct BrainGenes
     {
         public int Complexity { get; set; }
         public int NumLayers { get; set; }
+        public int SignalPasses { get; set; }
     }
 
-    public struct EyeStruct
+    public struct EyeGenes
     {
         public int ID { get; set; }
         public Vector3 Angle { get; set; }
     }
 
-    public struct MouthStruct
+    public struct MouthGenes
     {
         public int ID { get; set; }
         public Vector3 Angle { get; set; }
     }
 
-    public EntityType EntityType { get; set; }
-    public BodyStruct BodyData { get; set; }
-    public BrainStruct BrainData { get; set; }
-    public Brain Brain { get; set; }
-    public List<EyeStruct> EyesData { get; set; }
-    public List<MouthStruct> MouthsData { get; set; }
+    public EntityType EntityTypeGene { get; set; }
+    public BodyGenes BodyGene { get; set; }
+    public BrainGenes BrainGene { get; set; }
+    // public Brain Brain { get; set; }
+    public List<EyeGenes> EyesGene { get; set; }
+    public List<MouthGenes> MouthsGene { get; set; }
 
     public DNA()
     {
-        EyesData = new List<EyeStruct>();
-        MouthsData = new List<MouthStruct>();
+        EyesGene = new List<EyeGenes>();
+        MouthsGene = new List<MouthGenes>();
     }
 
     public DNA(
         EntityType entityType,
-        BodyStruct bodyData,
-        BrainStruct brainData,
-        List<EyeStruct> eyesData,
-        List<MouthStruct> mouthsData)
+        BodyGenes bodyData,
+        BrainGenes brainData,
+        List<EyeGenes> eyesData,
+        List<MouthGenes> mouthsData)
     {
-        EntityType = entityType;
-        BodyData = bodyData;
-        BrainData = brainData;
-        EyesData = eyesData;
-        MouthsData = mouthsData;
+        EntityTypeGene = entityType;
+        BodyGene = bodyData;
+        BrainGene = brainData;
+        EyesGene = eyesData;
+        MouthsGene = mouthsData;
     }
 
     public string GetDNAString()
     {
         StringBuilder builder = new();
 
-        switch (EntityType)
+        switch (EntityTypeGene)
         {
             case EntityType.Creature:
                 builder.Append("");

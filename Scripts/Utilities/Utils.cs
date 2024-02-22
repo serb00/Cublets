@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -108,5 +109,14 @@ public static class Utils
             GD.PrintErr("Failed to decode object: ", ex.Message);
             return default;
         }
+    }
+
+    internal static string GetParentDirectory(string directory)
+    {
+        // Split the path by the separator
+        string[] parts = directory.TrimEnd('/').Split('/');
+
+        // Remove the last folder by taking all parts except the last
+        return string.Join("/", parts.Take(parts.Length - 1));
     }
 }

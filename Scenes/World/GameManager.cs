@@ -43,7 +43,6 @@ public partial class GameManager : Node
 		}
 		if (Input.IsActionJustPressed("pause"))
 		{
-			// Engine.TimeScale
 			GetTree().Paused = !GetTree().Paused;
 			GD.Print("pause");
 		}

@@ -6,7 +6,7 @@ public partial class SimulationManager : Node
 {
 
     List<Creature> population = new();
-    readonly BodyPartsCollection bodyPartsCollection = new();
+    BodyPartsCollection bodyPartsCollection;
     PathFollow3D spawnPath;
 
     SimulationParameters _parameters;
@@ -29,6 +29,8 @@ public partial class SimulationManager : Node
     {
         _parameters = GetNode<SimulationParameters>("SimulationParameters");
         spawnPath = GetNode<PathFollow3D>("/root/Main/Creatures/SpawnPath/SpawnLocation");
+        bodyPartsCollection = GetNode<BodyPartsCollection>("/root/BodyPartsCollection");
+        Engine.RegisterSingleton("BodyPartsCollection", bodyPartsCollection);
         keepInPopulation = _parameters.KeepFromPopulationPercent * _parameters.InitialPopulationSize / 100;
         mutateInPopulation = _parameters.MutateFromPopulationPercent * _parameters.InitialPopulationSize / 100;
         changeBrainInPopulation = _parameters.ChangeBrainFromPopulationPercent * _parameters.InitialPopulationSize / 100;
@@ -88,22 +90,27 @@ public partial class SimulationManager : Node
         // TODO: Implement creature generation based on your parameters
         if (dna == null)
         {
-            DNA.BodyStruct bodyData = new() { ID = 1, Type = "Body", Size = 1.0f };
-            DNA.BrainStruct brainData = new() { Complexity = 1, NumLayers = 1 };
-            List<DNA.EyeStruct> eyesData = new() {
+            DNA.BodyGenes bodyGene = new()
+            {
+                ID = 1,
+                Type = BodyPartType.Body,
+                Size = 1.0f,
+            };
+            DNA.BrainGenes brainGene = new() { Complexity = 1, NumLayers = 1 };
+            List<DNA.EyeGenes> eyesGene = new() {
                 new() { ID = 1, Angle = new(0, 0.5f, -1) }
                 // , new() { ID = 2, Angle = new(-1, 0.25f, 0) }
             };
-            List<DNA.MouthStruct> mouthsData = new() {
+            List<DNA.MouthGenes> mouthsGene = new() {
                 new() { ID = 1, Angle = new(0, -0.5f, -1) }
             };
 
             dna = new DNA(
                 EntityType.Creature,
-                bodyData,
-                brainData,
-                eyesData,
-                mouthsData
+                bodyGene,
+                brainGene,
+                eyesGene,
+                mouthsGene
             );
         }
 

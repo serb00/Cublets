@@ -8,8 +8,9 @@ public partial class Body : CollisionShape3D
 	[Export] CollisionShape3D _collisionShape3D;
 	Vector3 _scale;
 
-	public void Initialize(Creature creature)
+	public void Initialize(Creature creature, BodyData bodyData)
 	{
+		_bodyData = bodyData;
 
 		// GD.Print("Body Initialize");
 		creature._energyManager.AdjustMaxEnergy(_bodyData.Size * 500);

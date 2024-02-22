@@ -33,6 +33,7 @@ public partial class Creature : CharacterBody3D, IVisible
     Body _body;
     public EnergyManager _energyManager;
     public DNA _dna;
+    private BodyPartsCollection _bodyPartsCollection;
 
     /// <summary>
     /// List of body parts that the creature has.
@@ -58,12 +59,14 @@ public partial class Creature : CharacterBody3D, IVisible
     {
         _dna = dna;
         Position = position;
+        _bodyPartsCollection = (BodyPartsCollection)Engine.GetSingleton("BodyPartsCollection");
 
         //prefill body parts list
-        CreateBodyPartsList();
+        CreateBodyPartsListFromDNA();
         _body = _bodyScene.Instantiate() as Body;
         _energyManager = new EnergyManager(0, _body.GetSize());
-        _body.Initialize(this);
+        var bodyData = (BodyData)ResourceLoader.Load(_bodyPartsCollection.GetBodyPartResourseOfTypeByIndex(_dna.BodyGene.Type, _dna.BodyGene.ID));
+        _body.Initialize(this, bodyData);
         AddChild(_body);
         InitializeBodyParts();
         InitializeBrain();
@@ -79,63 +82,59 @@ public partial class Creature : CharacterBody3D, IVisible
         }
     }
 
-    private void CreateBodyPartsList()
+    private void CreateBodyPartsListFromDNA()
     {
         int currentNeuronIndex = 0;
         int brainInputNeurons = 0;
         int brainOutputNeurons = 0;
+
         // Eyes
-        PackedScene eyeScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Eye/Eye.tscn");
-        EyeData eyeData = (EyeData)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Eye/Eyes/Eye_01.tres");
-        var eye = CreateEye(
-            eyeScene,
-            eyeData,
-            new(0, 0.5f, -1),
-            currentNeuronIndex,
-            out currentNeuronIndex
-        );
-        _bodyParts.Add(eye);
+        foreach (var eyeGene in _dna.EyesGene)
+        {
+            string path = _bodyPartsCollection.GetBodyPartResourseOfTypeByIndex(BodyPartType.Eye, 0);
+            PackedScene eyeScene = (PackedScene)ResourceLoader.Load(path);
+            path = _bodyPartsCollection.GetBodyPartResourseOfTypeByIndex(BodyPartType.Eye, eyeGene.ID);
+            EyeData eyeData = (EyeData)ResourceLoader.Load(path);
+            var newEye = CreateEye(
+                eyeScene,
+                eyeData,
+                eyeGene.Angle,
+                currentNeuronIndex,
+                out currentNeuronIndex
+            );
+            _bodyParts.Add(newEye);
 
-        InputNeuronsList.Add(new BrainZone(BrainZoneType.Visual, currentNeuronIndex - brainInputNeurons, eye));
-        brainInputNeurons = currentNeuronIndex;
+            InputNeuronsList.Add(new BrainZone(BrainZoneType.Visual, currentNeuronIndex - brainInputNeurons, newEye));
+            brainInputNeurons = currentNeuronIndex;
 
-        // CreateEye(
-        //     eyeScene,
-        //     eyeData,
-        //     new(1, 0, 0),
-        //     currentNeuronIndex,
-        //     out currentNeuronIndex
-        // );
-
-        // eyeData = (EyeData)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Eye/Eyes/Eye_02.tres");
-        // currentNeuronIndex = CreateEye(
-        //     eyeScene,
-        //     eyeData,
-        //     new(-1, 0.25f, 0),
-        //     currentNeuronIndex
-        // );
-
+        }
 
         // Movement
         OutputNeuronsList.Add(new BrainZone(BrainZoneType.Movement, 2));
         brainOutputNeurons += 2;
 
         // Mouths
-        PackedScene mouthScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Mouth/Mouth.tscn");
-        MouthData mouthData = (MouthData)ResourceLoader.Load("res://Scenes/Entities/Creatures/Body_parts/Mouth/Mouths/Mouth_001.tres");
-        var mouth = CreateMouth(
-            mouthScene,
-            mouthData,
-            new(0, -0.5f, -1),
-            currentNeuronIndex,
-            out currentNeuronIndex
-        );
-        _bodyParts.Add(mouth);
+        foreach (var mouthGene in _dna.MouthsGene)
+        {
+            var path = _bodyPartsCollection.GetBodyPartResourseOfTypeByIndex(BodyPartType.Mouth, 0);
+            PackedScene mouthScene = (PackedScene)ResourceLoader.Load(path);
+            path = _bodyPartsCollection.GetBodyPartResourseOfTypeByIndex(BodyPartType.Mouth, mouthGene.ID);
+            MouthData mouthData = (MouthData)ResourceLoader.Load(path);
+            var newMouth = CreateMouth(
+                mouthScene,
+                mouthData,
+                mouthGene.Angle,
+                currentNeuronIndex,
+                out currentNeuronIndex
+            );
+            _bodyParts.Add(newMouth);
 
-        InputNeuronsList.Add(new BrainZone(BrainZoneType.Consumption, currentNeuronIndex - brainInputNeurons, mouth));
-        brainInputNeurons = currentNeuronIndex;
-        OutputNeuronsList.Add(new BrainZone(BrainZoneType.Consumption, mouthData.OutputNeurons, mouth));
-        brainOutputNeurons += mouthData.OutputNeurons;
+            InputNeuronsList.Add(new BrainZone(BrainZoneType.Consumption, currentNeuronIndex - brainInputNeurons, newMouth));
+            brainInputNeurons = currentNeuronIndex;
+            OutputNeuronsList.Add(new BrainZone(BrainZoneType.Consumption, mouthData.OutputNeurons, newMouth));
+            brainOutputNeurons += mouthData.OutputNeurons;
+        }
+
     }
 
     private Eye CreateEye(PackedScene eyeScene, EyeData eyeData, Vector3 angle, int currentNeuronIndex, out int neuronLastIndex)
