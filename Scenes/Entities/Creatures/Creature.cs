@@ -33,6 +33,7 @@ public partial class Creature : CharacterBody3D, IVisible
     Body _body;
     public EnergyManager _energyManager;
     public DNA _dna;
+    // TODO: movethis to reference and the building logic to other class Builder from DNA
     private BodyPartsCollection _bodyPartsCollection;
 
     /// <summary>
