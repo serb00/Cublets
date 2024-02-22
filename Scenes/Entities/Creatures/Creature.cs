@@ -171,7 +171,6 @@ public partial class Creature : CharacterBody3D, IVisible
             InputNeuronsList,
             OutputNeuronsList,
             _dna.BrainGene.NumHiddenLayers,
-            _dna.BrainGene.SignalPasses,
             _dna.BrainGene.ConnectionsMethod,
             this);
     }
@@ -370,7 +369,6 @@ public partial class Creature : CharacterBody3D, IVisible
             secondsSinceLastBrainUpdate = 0f;
             _energyManager.SpendEnergy(
                 _energyManager.CalculateEnergyConsumptionBrainProcessing(
-                    _brain.GetSignalPasses(),
                     _brain.GetNeuronConnectionsCount(),
                     _brain.GetNeuronsCount()
                 )

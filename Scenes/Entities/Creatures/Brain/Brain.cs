@@ -11,7 +11,6 @@ public class Brain
     public int NumInputNeurons { get; set; }
     public int NumOutputNeurons { get; set; }
     public int NumTotalNeurons { get; set; }
-    public int SignalPasses { get; set; }
     public List<NeuronsMapItem> NeuronsMap { get; set; }
 
     public Dictionary<int, Action> OutputMappings { get; set; }
@@ -28,11 +27,10 @@ public class Brain
     public void Initialize(
         List<BrainZone> inputNeuronsList,
         List<BrainZone> outputNeuronsList,
-        int brainHiddenLayers, int signalPasses,
+        int brainHiddenLayers,
         NNConnectionsMethod connectionsMethod,
         Creature creature)
     {
-        SignalPasses = signalPasses;
         NumInputNeurons = inputNeuronsList.Sum(x => x.NeuronsCount);
         NumOutputNeurons = outputNeuronsList.Sum(x => x.NeuronsCount);
         int[] NumHiddenNeurons = new int[brainHiddenLayers];
@@ -46,7 +44,7 @@ public class Brain
         lastIndex = MapHiddenNeurons(NumHiddenNeurons, lastIndex);
         MapOutputNeurons(outputNeuronsList, brainHiddenLayers + 1, lastIndex);
 
-        NeuralNetwork = new NeuralNetwork(NeuronsMap, signalPasses, connectionsMethod);
+        NeuralNetwork = new NeuralNetwork(NeuronsMap, connectionsMethod);
 
         creature._energyManager.AdjustMaxEnergy(NumTotalNeurons * NeuralNetwork.NeuronConnections.Count * 10);
         OutputMappings = new();
@@ -191,11 +189,6 @@ public class Brain
     #endregion NeuronHelpers
 
     #region NetworkHelpers
-
-    public int GetSignalPasses()
-    {
-        return NeuralNetwork.SignalPasses;
-    }
 
     public int GetNeuronConnectionsCount()
     {

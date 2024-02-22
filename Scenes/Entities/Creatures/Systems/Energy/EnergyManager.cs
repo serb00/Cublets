@@ -68,9 +68,9 @@ public class EnergyManager
         return energyConsumed;
     }
 
-    public float CalculateEnergyConsumptionBrainProcessing(int signalPasses, int neuronConnectionsCount, int neuronsCount)
+    public float CalculateEnergyConsumptionBrainProcessing(int neuronConnectionsCount, int neuronsCount)
     {
-        float energyConsumed = signalPasses * neuronConnectionsCount * neuronsCount * EnergyCostBrainProcessing;
+        float energyConsumed = neuronConnectionsCount * neuronsCount * EnergyCostBrainProcessing;
         return energyConsumed;
     }
 

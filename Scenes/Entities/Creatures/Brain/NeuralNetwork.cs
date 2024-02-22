@@ -17,10 +17,6 @@ public class NeuralNetwork
     /// Stores the connections for all neurons in the neural network.
     /// </summary>
     public List<NeuronConnection> NeuronConnections { get; set; }
-    /// <summary>
-    /// Stores the number of signal passes in the neural network per network update.
-    /// </summary>
-    public int SignalPasses { get; set; }
 
     #endregion Attributes
 
@@ -31,11 +27,10 @@ public class NeuralNetwork
     /// </summary>
     public NeuralNetwork() { }
 
-    public NeuralNetwork(List<NeuronsMapItem> neuronsMap, int signalPasses, NNConnectionsMethod connectionsMethod)
+    public NeuralNetwork(List<NeuronsMapItem> neuronsMap, NNConnectionsMethod connectionsMethod)
     {
         Neurons = new List<Neuron>();
         NeuronConnections = new List<NeuronConnection>();
-        SignalPasses = signalPasses;
         InitializeNetwork(neuronsMap, connectionsMethod);
     }
 
@@ -144,18 +139,21 @@ public class NeuralNetwork
     /// </summary>
     public void UpdateNetwork()
     {
-        for (int i = 0; i < SignalPasses; i++)
+        // Group connections by target neuron ID
+        var connectionsByTargetId = NeuronConnections.GroupBy(x => x.TargetNeuronID)
+        .ToDictionary(group => group.Key, group => group.ToList());
+
+        foreach (var neuron in Neurons)
         {
-            foreach (var neuron in Neurons)
+            // Avoid recalculating connections inside the loop
+            if (connectionsByTargetId.TryGetValue(neuron.ID, out var connections))
             {
-                // neuron.CalculateOutput();
-                var connections = NeuronConnections.Where(x => x.TargetNeuronID == neuron.ID);
                 float tempValue = neuron.OutputValue;
                 foreach (var conn in connections)
                 {
                     tempValue += Neurons[conn.SourceNeuronID].OutputValue * conn.Weight;
                 }
-                neuron.OutputValue = Utils.ScaleValue(tempValue + neuron.Bias, -connections.Count() - 1, connections.Count() + 1);
+                neuron.OutputValue = Utils.ScaleValue(tempValue + neuron.Bias, -connections.Count - 1, connections.Count + 1);
 
                 neuron.Activate();
             }

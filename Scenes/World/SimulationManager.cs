@@ -190,12 +190,12 @@ public partial class SimulationManager : Node
         DNA.BrainGenes brainGene = new()
         {
             NumHiddenLayers = GD.RandRange(0, 5),
-            SignalPasses = 1,
             ConnectionsMethod = Utils.GetRandomEnumValue<NNConnectionsMethod>()
         };
         List<DNA.EyeGenes> eyesGene = new() {
                 new() { ID = 1, Angle = new(0, 0.5f, -1) }
-                //, new() { ID = 2, Angle = new(-1, 0.25f, 0) }
+                , new() { ID = 3, Angle = new(-1, 0.25f, 0) }
+                , new() { ID = 3, Angle = new(1, 0.25f, 0) }
             };
         List<DNA.MouthGenes> mouthsGene = new() {
                 new() { ID = 1, Angle = new(0, -0.5f, -1) }

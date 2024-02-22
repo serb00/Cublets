@@ -18,7 +18,6 @@ public class DNA
     public struct BrainGenes
     {
         public int NumHiddenLayers { get; set; }
-        public int SignalPasses { get; set; }
         public NNConnectionsMethod ConnectionsMethod { get; set; }
     }
 
