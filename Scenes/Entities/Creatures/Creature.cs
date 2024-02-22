@@ -18,8 +18,6 @@ public partial class Creature : CharacterBody3D, IVisible
 
     double updateBrainIntervalSeconds = 0.5;
     double secondsSinceLastBrainUpdate = 1; // so the brain updates on the first frame
-    [Export] int minHiddenLayers = 0;
-    [Export] int maxHiddenLayers = 2;
 
     [Export] float MaxSpeedPerSecond = 1000; // m/s
     [Export] float MaxRotationPerSecond = 90; // degrees
