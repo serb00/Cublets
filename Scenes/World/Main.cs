@@ -43,14 +43,22 @@ public partial class Main : Node
 
 	private void OnFoodTimerTimeout()
 	{
+		for (int i = 0; i < 10; i++)
+		{
+			SpawnFood();
+		}
+	}
+
+	private void SpawnFood()
+	{
 		// Create a new instance of the Mob scene.
 		Food food = FoodScene.Instantiate<Food>();
 
 		// Choose a random location on the SpawnPath.
 		// We store the reference to the SpawnLocation node.
-		int spawnX = (int)GD.RandRange(-30, 30 + 1);
-		int spawnZ = (int)GD.RandRange(-30, 30 + 1);
-		Vector3 foodSpawnLocation = new(spawnX, 0.3f, spawnZ);
+		int spawnX = (int)GD.RandRange(-85, 85 + 1);
+		int spawnZ = (int)GD.RandRange(-85, 85 + 1);
+		Vector3 foodSpawnLocation = new(spawnX, 0.2f, spawnZ);
 
 		food.Initialize(foodSpawnLocation);
 
