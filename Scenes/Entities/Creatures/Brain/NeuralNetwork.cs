@@ -17,6 +17,7 @@ public class NeuralNetwork
     /// Stores the connections for all neurons in the neural network.
     /// </summary>
     public List<NeuronConnection> NeuronConnections { get; set; }
+    private Dictionary<int, List<NeuronConnection>> _connectionsByTargetId;
 
     #endregion Attributes
 
@@ -62,6 +63,10 @@ public class NeuralNetwork
                 CreatePartialForwardConnections(neuronsMap);
                 break;
         }
+
+        // Group connections by target neuron ID for faster access
+        _connectionsByTargetId = NeuronConnections.GroupBy(x => x.TargetNeuronID)
+        .ToDictionary(group => group.Key, group => group.ToList());
     }
 
     /// <summary>
@@ -139,14 +144,11 @@ public class NeuralNetwork
     /// </summary>
     public void UpdateNetwork()
     {
-        // Group connections by target neuron ID
-        var connectionsByTargetId = NeuronConnections.GroupBy(x => x.TargetNeuronID)
-        .ToDictionary(group => group.Key, group => group.ToList());
 
         foreach (var neuron in Neurons)
         {
-            // Avoid recalculating connections inside the loop
-            if (connectionsByTargetId.TryGetValue(neuron.ID, out var connections))
+            // Avoid recalculating connections which have no connections
+            if (_connectionsByTargetId.TryGetValue(neuron.ID, out var connections))
             {
                 float tempValue = neuron.OutputValue;
                 foreach (var conn in connections)
@@ -154,9 +156,10 @@ public class NeuralNetwork
                     tempValue += Neurons[conn.SourceNeuronID].OutputValue * conn.Weight;
                 }
                 neuron.OutputValue = Utils.ScaleValue(tempValue + neuron.Bias, -connections.Count - 1, connections.Count + 1);
-
-                neuron.Activate();
             }
+
+            // Keep activation outside the loop to update input layer neurons
+            neuron.Activate();
         }
     }
 
