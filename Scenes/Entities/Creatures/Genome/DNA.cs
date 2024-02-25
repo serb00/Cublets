@@ -11,7 +11,6 @@ public class DNA
     public struct BodyGenes
     {
         public int ID { get; set; }
-        public BodyPartType Type { get; set; }
         public float Size { get; set; }
     }
 
@@ -58,6 +57,56 @@ public class DNA
         BrainGene = brainData;
         EyesGene = eyesData;
         MouthsGene = mouthsData;
+    }
+
+    public DNA VerifyAndFixDNA(BodyPartsCollection bodyPartsCollection)
+    {
+        bodyPartsCollection.GetBodyPartMinMaxIDs(BodyPartType.Body, out int minID, out int maxID);
+        BodyGenes bodyGene = new()
+        {
+            ID = Mathf.Clamp(BodyGene.ID, minID, maxID),
+            Size = Mathf.Clamp(BodyGene.Size, 0.5f, 10f)
+        };
+        BodyGene = bodyGene;
+
+        BrainGenes brainGene = new()
+        {
+            NumHiddenLayers = BrainGene.NumHiddenLayers < 0 ? 0 : BrainGene.NumHiddenLayers,
+            ConnectionsMethod = BrainGene.ConnectionsMethod
+        };
+        BrainGene = brainGene;
+
+        bodyPartsCollection.GetBodyPartMinMaxIDs(BodyPartType.Eye, out minID, out maxID);
+        for (int i = 0; i < EyesGene.Count; i++)
+        {
+            EyeGenes eyeGene = new()
+            {
+                ID = Mathf.Clamp(EyesGene[i].ID, minID, maxID),
+                Angle = new(
+                    Mathf.Clamp(EyesGene[i].Angle.X, -1, 1),
+                    Mathf.Clamp(EyesGene[i].Angle.Y, -1, 1),
+                    Mathf.Clamp(EyesGene[i].Angle.Z, -1, 1)
+                )
+            };
+            EyesGene[i] = eyeGene;
+        }
+
+        bodyPartsCollection.GetBodyPartMinMaxIDs(BodyPartType.Mouth, out minID, out maxID);
+        for (int i = 0; i < MouthsGene.Count; i++)
+        {
+            MouthGenes mouthGene = new()
+            {
+                ID = Mathf.Clamp(MouthsGene[i].ID, minID, maxID),
+                Angle = new(
+                    Mathf.Clamp(MouthsGene[i].Angle.X, -1, 1),
+                    Mathf.Clamp(MouthsGene[i].Angle.Y, -1, 1),
+                    Mathf.Clamp(MouthsGene[i].Angle.Z, -1, 1)
+                )
+            };
+            MouthsGene[i] = mouthGene;
+        }
+
+        return this;
     }
 
     public string GetDNAString()

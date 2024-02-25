@@ -64,4 +64,11 @@ public partial class BodyPartsCollection : Node
     {
         return bodyParts[type][id];
     }
+
+    public void GetBodyPartMinMaxIDs(BodyPartType type, out int minID, out int maxID)
+    {
+        // exclude the 0 body part key as it's a scene file for the body part
+        minID = bodyParts[type].Keys.Where(key => key != 0).Min();
+        maxID = bodyParts[type].Keys.Max();
+    }
 }

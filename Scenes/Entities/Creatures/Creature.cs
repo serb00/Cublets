@@ -64,7 +64,7 @@ public partial class Creature : CharacterBody3D, IVisible
         CreateBodyPartsListFromDNA();
         _body = _bodyScene.Instantiate() as Body;
         _energyManager = new EnergyManager(0, _body.GetSize());
-        var bodyData = (BodyData)ResourceLoader.Load(_bodyPartsCollection.GetBodyPartResourseOfTypeByIndex(_dna.BodyGene.Type, _dna.BodyGene.ID));
+        var bodyData = (BodyData)ResourceLoader.Load(_bodyPartsCollection.GetBodyPartResourseOfTypeByIndex(BodyPartType.Body, _dna.BodyGene.ID));
         bodyData.Size = _dna.BodyGene.Size;
         _body.Initialize(this, bodyData);
         AddChild(_body);
@@ -305,6 +305,11 @@ public partial class Creature : CharacterBody3D, IVisible
         };
     }
 
+    public float GetFitness()
+    {
+        return Fitness;
+    }
+
     #endregion Getters
 
     #region Setters
@@ -405,6 +410,11 @@ public partial class Creature : CharacterBody3D, IVisible
         CollisionMask = 1 | (1 << 1); // Enables layers 1 and 2 for detection
         Position = position;
         _energyManager.Reset();
+    }
+
+    public void CalculateFitness()
+    {
+        Fitness = (_energyManager.TotalEnergyReplenished - _energyManager.TotalEnergySpend) / _energyManager.TotalEnergySpend;
     }
 
     #endregion Logic

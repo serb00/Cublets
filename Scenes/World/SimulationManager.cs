@@ -5,6 +5,8 @@ using Godot;
 public partial class SimulationManager : Node
 {
 
+    #region Attributes
+
     List<Creature> population = new();
     BodyPartsCollection bodyPartsCollection;
     PathFollow3D spawnPath;
@@ -17,6 +19,10 @@ public partial class SimulationManager : Node
     double currentGenerationTime = 0;
     int currentSimulationCycle = 0;
     bool simulationRunning = false;
+
+    #endregion Attributes
+
+    #region Constructors
 
     public override void _Ready()
     {
@@ -35,7 +41,12 @@ public partial class SimulationManager : Node
         mutateInPopulation = _parameters.MutateFromPopulationPercent * _parameters.InitialPopulationSize / 100;
         changeBrainInPopulation = _parameters.ChangeBrainFromPopulationPercent * _parameters.InitialPopulationSize / 100;
         randomInPopulation = _parameters.RandomInPopulationPercent * _parameters.InitialPopulationSize / 100;
+
     }
+
+    #endregion Constructors
+
+    #region Simulation cycle
 
     void StartSimulationCycle()
     {
@@ -85,36 +96,13 @@ public partial class SimulationManager : Node
         }
     }
 
-    Creature GenerateCreature(DNA dna = null)
-    {
-        // TODO: Implement creature generation based on your parameters
-        if (dna == null)
-        {
-            dna = CreateNewDNA();
-        }
-
-        PackedScene creatureScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Creature.tscn");
-        Creature creature = creatureScene.Instantiate<Creature>();
-
-        creature.Initialize(GetRandomSpawnPosition(), dna);
-
-        var parentCreatures = GetNode<Node>("/root/Main/Creatures");
-
-        // Spawn the creature by adding it to the Main scene.
-        parentCreatures.AddChild(creature);
-        return creature;
-    }
-
-    private Vector3 GetRandomSpawnPosition()
-    {
-        spawnPath.ProgressRatio = GD.Randf();
-        return spawnPath.Position;
-    }
-
     void CalculateFitnessForPopulation()
     {
         GD.Print("Calculating fitness for population");
-        // Implement fitness calculation for each creature
+        foreach (var creature in population)
+        {
+            creature.CalculateFitness();
+        }
     }
 
     void PrepareNextGeneration()
@@ -122,13 +110,16 @@ public partial class SimulationManager : Node
         GD.Print("Preparing next generation");
         // Sort population based on fitness
         var sortedByFitness = population.OrderByDescending(creature => creature.Fitness).ToList();
+        GD.Print($"Best fitness: {sortedByFitness[0].Fitness}");
+        GD.Print($"Average fitness: {sortedByFitness.Average(creature => creature.Fitness)}");
+        GD.Print($"Worst fitness: {sortedByFitness[^1].Fitness}");
 
         var nextGeneration = sortedByFitness.Take(keepInPopulation).ToList();
 
         // Mutate and add new entities based on top entities
         for (int i = 0; i < mutateInPopulation; i++)
         {
-            Creature mutated = MutateCreature(
+            Creature mutated = MutateCreatureDNA(
                 nextGeneration[GD.RandRange(0, keepInPopulation - 1)],
                 nextGeneration[GD.RandRange(0, keepInPopulation - 1)]);
             nextGeneration.Add(mutated);
@@ -167,10 +158,47 @@ public partial class SimulationManager : Node
         population = nextGeneration;
     }
 
-    Creature MutateCreature(Creature firstParent, Creature secondParent)
+    #endregion Simulation cycle
+
+    #region Creature generation
+
+    Creature GenerateCreature(DNA dna = null)
     {
-        // TODO: Implement mutation based on two parents
-        return GenerateCreature(); // Placeholder
+        // TODO: Implement creature generation based on your parameters
+        if (dna == null)
+        {
+            dna = CreateNewDNA();
+        }
+
+        PackedScene creatureScene = (PackedScene)ResourceLoader.Load("res://Scenes/Entities/Creatures/Creature.tscn");
+        Creature creature = creatureScene.Instantiate<Creature>();
+
+        creature.Initialize(GetRandomSpawnPosition(), dna);
+
+        var parentCreatures = GetNode<Node>("/root/Main/Creatures");
+
+        // Spawn the creature by adding it to the Main scene.
+        parentCreatures.AddChild(creature);
+        return creature;
+    }
+
+    private Vector3 GetRandomSpawnPosition()
+    {
+        spawnPath.ProgressRatio = GD.Randf();
+        return spawnPath.Position;
+    }
+
+
+    Creature MutateCreatureDNA(Creature firstParent, Creature secondParent)
+    {
+        // Mutation based on two parents DNAs
+        DNA dna = DNAMutator.MutateCreatureDNA(firstParent._dna, secondParent._dna);
+        dna = dna.VerifyAndFixDNA(bodyPartsCollection);
+        var creature = GenerateCreature(dna);
+
+        // TODO: copy over brain of the fittest parent
+
+        return creature;
     }
 
     Creature RandomizeBrain(Creature creature)
@@ -184,7 +212,6 @@ public partial class SimulationManager : Node
         DNA.BodyGenes bodyGene = new()
         {
             ID = 1,
-            Type = BodyPartType.Body,
             // Size = (float)GD.RandRange(_parameters.MinCreatureSize, _parameters.MaxCreatureSize),
             Size = 1,
         };
@@ -212,6 +239,10 @@ public partial class SimulationManager : Node
         );
     }
 
+    #endregion Creature generation
+
+    #region Simulation loop
+
     public override void _PhysicsProcess(double delta)
     {
         base._PhysicsProcess(delta);
@@ -223,4 +254,7 @@ public partial class SimulationManager : Node
             FinishSimulationCycle();
         }
     }
+
+    #endregion Simulation loop
+
 }
