@@ -48,6 +48,9 @@ script = ExtResource("5_c2w18")
 
 [node name="SimulationParameters" type="Node" parent="GameManager/SimulationManager"]
 script = ExtResource("5_2lmqp")
+MaxGenerations = 100
+MinBrainHiddenLayers = 2
+MaxBrainHiddenLayers = 10
 
 [node name="Level" type="Node" parent="."]
 

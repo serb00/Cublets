@@ -110,9 +110,9 @@ public partial class SimulationManager : Node
         GD.Print("Preparing next generation");
         // Sort population based on fitness
         var sortedByFitness = population.OrderByDescending(creature => creature.Fitness).ToList();
-        GD.Print($"Best fitness: {sortedByFitness[0].Fitness}");
+        GD.Print($"Best fitness: {sortedByFitness[0].Fitness}. Creature: {sortedByFitness[0].Name}");
         GD.Print($"Average fitness: {sortedByFitness.Average(creature => creature.Fitness)}");
-        GD.Print($"Worst fitness: {sortedByFitness[^1].Fitness}");
+        GD.Print($"Worst fitness: {sortedByFitness[^1].Fitness}. Creature: {sortedByFitness[^1].Name}");
 
         var nextGeneration = sortedByFitness.Take(keepInPopulation).ToList();
 
@@ -128,7 +128,7 @@ public partial class SimulationManager : Node
         // Randomize creatures brains based on top entities
         for (int i = 0; i < changeBrainInPopulation; i++)
         {
-            Creature mutated = RandomizeBrain(
+            Creature mutated = RandomizeBrainConnectionsWeights(
                 nextGeneration[GD.RandRange(0, keepInPopulation - 1)]
             );
             nextGeneration.Add(mutated);
@@ -204,10 +204,22 @@ public partial class SimulationManager : Node
         return creature;
     }
 
-    Creature RandomizeBrain(Creature creature)
+    Creature RandomizeBrainConnectionsWeights(Creature creature)
     {
-        // TODO: Implement randomization of brain
-        return GenerateCreature(); // Placeholder
+        var newCreature = GenerateCreature(creature._dna);
+        // Randomization of brain's neural network connections weights
+        var creatureBrain = Utils.DecodeObject<Brain>(Utils.EncodeObject(creature.GetBrain()));
+
+        foreach (var group in creatureBrain.NeuralNetwork._connectionsByTargetId)
+        {
+            foreach (var connection in group.Value)
+            {
+                connection.Weight = (float)GD.RandRange(-1f, 1f);
+            }
+        }
+        newCreature.SetBrain(creatureBrain);
+
+        return newCreature;
     }
 
     private DNA CreateNewDNA()

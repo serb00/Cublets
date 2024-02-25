@@ -17,7 +17,7 @@ public class NeuralNetwork
     /// Stores the connections for all neurons in the neural network.
     /// </summary>
     public List<NeuronConnection> NeuronConnections { get; set; }
-    private Dictionary<int, List<NeuronConnection>> _connectionsByTargetId;
+    public Dictionary<int, List<NeuronConnection>> _connectionsByTargetId { get; set; }
 
     #endregion Attributes
 

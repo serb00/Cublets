@@ -36,7 +36,7 @@ public class Brain
         int[] NumHiddenNeurons = new int[brainHiddenLayers];
         for (int i = 0; i < brainHiddenLayers; i++)
         {
-            NumHiddenNeurons[i] += GD.RandRange(NumInputNeurons, NumInputNeurons + NumOutputNeurons);
+            NumHiddenNeurons[i] += GD.RandRange(NumInputNeurons, NumInputNeurons * 3 + NumOutputNeurons);
         }
         NumTotalNeurons = NumInputNeurons + NumOutputNeurons + NumHiddenNeurons.Sum();
         NeuronsMap = new();
