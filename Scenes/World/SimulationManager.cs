@@ -196,7 +196,10 @@ public partial class SimulationManager : Node
         dna = dna.VerifyAndFixDNA(bodyPartsCollection);
         var creature = GenerateCreature(dna);
 
-        // TODO: copy over brain of the fittest parent
+        // Copy over brain of the fittest parent
+        var brainOfTheFittestParent = firstParent.Fitness > secondParent.Fitness ?
+            Utils.EncodeObject(firstParent.GetBrain()) : Utils.EncodeObject(secondParent.GetBrain());
+        creature.SetBrain(Utils.DecodeObject<Brain>(brainOfTheFittestParent));
 
         return creature;
     }
