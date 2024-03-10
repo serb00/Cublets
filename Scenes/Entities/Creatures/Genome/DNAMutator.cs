@@ -10,7 +10,6 @@ public class DNAMutator
     /// Example: 0.05f means 5% mutation rate.
     /// </summary>
     private const float mutationRate = 0.05f;
-    private readonly BodyPartsCollection bodyPartsCollection;
 
     public static DNA MutateCreatureDNA(DNA parent1, DNA parent2)
     {

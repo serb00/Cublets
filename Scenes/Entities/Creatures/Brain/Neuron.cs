@@ -26,18 +26,25 @@ public class Neuron
     /// </summary>
     public float Bias { get; set; }
 
+    public int Layer { get; set; }
+    public BrainZoneType BrainZoneType { get; set; }
+    public bool IsUsed { get; set; }
+
     /// <summary>
     /// Empty constructor. For JSON deserialization.
     /// </summary>
     public Neuron() { }
 
-    public Neuron(int id, NeuronActivationFunction? activationFunction = null)
+    public Neuron(int id, int layer, BrainZoneType brainZoneType, NeuronActivationFunction? activationFunction = null)
     {
         ID = id;
         OutputValue = (float)GD.RandRange(-1f, 1f);
         Bias = (float)GD.RandRange(-1f, 1f);
         // if activationFunction is not specified, use a random one
         ActivationFunction = activationFunction ?? Utils.GetRandomEnumValue<NeuronActivationFunction>();
+        Layer = layer;
+        BrainZoneType = brainZoneType;
+        IsUsed = true;
     }
 
     /// <summary>
@@ -73,5 +80,10 @@ public class Neuron
     public void SetValue(float val)
     {
         OutputValue = val;
+    }
+
+    public void Disable()
+    {
+        IsUsed = false;
     }
 }

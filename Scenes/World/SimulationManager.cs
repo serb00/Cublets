@@ -214,7 +214,10 @@ public partial class SimulationManager : Node
         {
             foreach (var connection in group.Value)
             {
-                connection.Weight = (float)GD.RandRange(-1f, 1f);
+                // Small perturbation instead of completely new value
+                connection.Weight += (float)GD.RandRange(-0.1f, 0.1f);
+                // Ensure weight remains within bounds
+                connection.Weight = Mathf.Clamp(connection.Weight, -1f, 1f);
             }
         }
         newCreature.SetBrain(creatureBrain);

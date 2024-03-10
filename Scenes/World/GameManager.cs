@@ -87,7 +87,7 @@ public partial class GameManager : Node
 		}
 		if (Input.IsActionJustPressed("Action4"))
 		{
-
+			selectedCreature.GetBrain().NeuralNetwork.CleanGraph();
 		}
 
 		#endregion InputManagement

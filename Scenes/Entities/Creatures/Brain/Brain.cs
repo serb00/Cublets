@@ -200,6 +200,11 @@ public class Brain
         return NeuralNetwork.Neurons.Count;
     }
 
+    public int[] GetNeuronIDsOfType(BrainZoneType type)
+    {
+        return NeuralNetwork.Neurons.FindAll(x => x.BrainZoneType == type).OrderBy(x => x.ID).Select(x => x.ID).ToArray();
+    }
+
     #endregion NetworkHelpers
 
 }

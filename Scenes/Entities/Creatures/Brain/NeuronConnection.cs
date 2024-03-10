@@ -18,12 +18,15 @@ public class NeuronConnection
     /// </summary>
     public float Weight { get; set; }
 
+    public int ConnectionFromLayer { get; set; }
+
     public NeuronConnection() { }
 
-    public NeuronConnection(int source, int target, float weight)
+    public NeuronConnection(int source, int target, float weight, int connectionFromLayer)
     {
         SourceNeuronID = source;
         TargetNeuronID = target;
         Weight = weight;
+        ConnectionFromLayer = connectionFromLayer;
     }
 }

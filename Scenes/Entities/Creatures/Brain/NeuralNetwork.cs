@@ -16,6 +16,8 @@ public class NeuralNetwork
     /// <summary>
     /// Stores the connections for all neurons in the neural network.
     /// </summary>
+    /// 
+    public List<Neuron> usedNeurons { get; set; }
     public List<NeuronConnection> NeuronConnections { get; set; }
     public Dictionary<int, List<NeuronConnection>> _connectionsByTargetId { get; set; }
 
@@ -44,13 +46,39 @@ public class NeuralNetwork
         // Create Neurons
         foreach (var neuron in neuronsMap)
         {
-            Neurons.Add(new Neuron(neuron.ID, neuron.ActivationFunction));
+            Neurons.Add(new Neuron(neuron.ID, neuron.Layer, neuron.Type, neuron.ActivationFunction));
         }
-        int maxLayer = neuronsMap.Max(x => x.Layer);
+        int attemptToGenerateConnections = 0;
 
+        // Create Connections
+        while (NeuronConnections.Count == 0)
+        {
+            if (attemptToGenerateConnections < 5)
+            {
+                CreateNetworkConnections(neuronsMap, connectionsMethod);
+                CleanGraph();
+                attemptToGenerateConnections++;
+            }
+            else
+            {
+                CreateNetworkConnections(neuronsMap, NNConnectionsMethod.Random);
+                CleanGraph();
+            }
+        }
+
+        usedNeurons = Neurons.FindAll(x => x.IsUsed == true).OrderBy(x => x.ID).ToList();
+
+        // Group connections by target neuron ID for faster access
+        _connectionsByTargetId = NeuronConnections.GroupBy(x => x.TargetNeuronID)
+        .ToDictionary(group => group.Key, group => group.ToList());
+    }
+
+    private void CreateNetworkConnections(List<NeuronsMapItem> neuronsMap, NNConnectionsMethod connectionsMethod)
+    {
         switch (connectionsMethod)
         {
             case NNConnectionsMethod.Random:
+                int maxLayer = neuronsMap.Max(x => x.Layer);
                 CreateRandomConnections(0, maxLayer);
                 break;
             case NNConnectionsMethod.Full:
@@ -63,10 +91,51 @@ public class NeuralNetwork
                 CreatePartialForwardConnections(neuronsMap);
                 break;
         }
+    }
 
-        // Group connections by target neuron ID for faster access
-        _connectionsByTargetId = NeuronConnections.GroupBy(x => x.TargetNeuronID)
-        .ToDictionary(group => group.Key, group => group.ToList());
+    public void CleanGraph()
+    {
+        // Step 1: Identify output layer neurons
+        List<Neuron> outputLayerNeurons = Neurons.Where(n => n.Layer == Neurons.Max(x => x.Layer)).ToList();
+
+        // Step 2: Traverse the graph from output layer neurons to input layer neurons
+        HashSet<int> visitedNeurons = new HashSet<int>();
+        foreach (var neuron in outputLayerNeurons)
+        {
+            TraverseGraph(neuron, visitedNeurons);
+        }
+
+        // Step 3: Remove connections that are not part of the traversal
+        NeuronConnections.RemoveAll(connection =>
+            !visitedNeurons.Contains(connection.SourceNeuronID) ||
+            !visitedNeurons.Contains(connection.TargetNeuronID));
+
+        // Step 4: Remove neurons that are not marked as visited
+        Neurons.FindAll(neuron => !visitedNeurons.Contains(neuron.ID)).ForEach(neuron =>
+        {
+            neuron.Disable();
+        });
+    }
+
+    private void TraverseGraph(Neuron neuron, HashSet<int> visitedNeurons)
+    {
+        if (!visitedNeurons.Contains(neuron.ID))
+        {
+            visitedNeurons.Add(neuron.ID);
+
+            // Find connections connected to this neuron
+            var connectedConnections = NeuronConnections.Where(connection => connection.TargetNeuronID == neuron.ID);
+
+            // Traverse connected neurons
+            foreach (var connection in connectedConnections)
+            {
+                var connectedNeuron = Neurons.FirstOrDefault(n => n.ID == connection.SourceNeuronID);
+                if (connectedNeuron != null)
+                {
+                    TraverseGraph(connectedNeuron, visitedNeurons);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -86,7 +155,7 @@ public class NeuralNetwork
                 foreach (var toNeuron in selectedNeurons)
                 {
                     //Neurons[toNeuron.ID].Connections.Add(new Connection(Neurons[fromNeuron.ID], Neurons[toNeuron.ID], (float)GD.RandRange(-1f, 1f)));
-                    NeuronConnections.Add(new NeuronConnection(fromNeuron.ID, toNeuron.ID, (float)GD.RandRange(-1f, 1f)));
+                    NeuronConnections.Add(new NeuronConnection(fromNeuron.ID, toNeuron.ID, (float)GD.RandRange(-1f, 1f), fromNeuron.Layer));
                 }
             });
         }
@@ -108,7 +177,7 @@ public class NeuralNetwork
                 neuronsMap.FindAll(x => x.Layer == currentLayer - 1).ForEach(toNeuron =>
                 {
                     // Neurons[fromNeuron.ID].Connections.Add(new Connection(Neurons[fromNeuron.ID], Neurons[toNeuron.ID], (float)GD.RandRange(-1f, 1f)));
-                    NeuronConnections.Add(new NeuronConnection(fromNeuron.ID, toNeuron.ID, (float)GD.RandRange(-1f, 1f)));
+                    NeuronConnections.Add(new NeuronConnection(fromNeuron.ID, toNeuron.ID, (float)GD.RandRange(-1f, 1f), fromNeuron.Layer));
                 });
             });
         }
@@ -130,7 +199,7 @@ public class NeuralNetwork
                 var targetNeuron = Neurons[GD.RandRange(0, Neurons.Count - 1)];
                 var weight = (float)GD.RandRange(-1f, 1f); // Random weight between -1 and 1
                 // neuron.Connections.Add(new Connection(neuron, targetNeuron, weight));
-                NeuronConnections.Add(new NeuronConnection(neuron.ID, targetNeuron.ID, weight));
+                NeuronConnections.Add(new NeuronConnection(neuron.ID, targetNeuron.ID, weight, neuron.Layer));
             }
         }
     }
@@ -145,17 +214,17 @@ public class NeuralNetwork
     public void UpdateNetwork()
     {
 
-        foreach (var neuron in Neurons)
+        foreach (var neuron in usedNeurons)
         {
             // Avoid recalculating connections which have no connections
             if (_connectionsByTargetId.TryGetValue(neuron.ID, out var connections))
             {
-                float tempValue = neuron.OutputValue;
+                float tempValue = 0;
                 foreach (var conn in connections)
                 {
                     tempValue += Neurons[conn.SourceNeuronID].OutputValue * conn.Weight;
                 }
-                neuron.OutputValue = Utils.ScaleValue(tempValue + neuron.Bias, -connections.Count - 1, connections.Count + 1);
+                neuron.OutputValue = tempValue + neuron.Bias;
             }
 
             // Keep activation outside the loop to update input layer neurons
@@ -180,11 +249,11 @@ public class NeuralNetwork
     /// <summary>
     /// Sets the value of a neuron in the neural network.
     /// </summary>
-    /// <param name="neuronIndex">The index of the neuron.</param>
+    /// <param name="neuronID">The index of the neuron.</param>
     /// <param name="val">The value to set.</param>
-    public void SetNeuronValue(int neuronIndex, float val)
+    public void SetNeuronValue(int neuronID, float val)
     {
-        Neurons[neuronIndex].SetValue(val);
+        Neurons[neuronID].SetValue(val);
     }
 
     #endregion NeuronHelpers

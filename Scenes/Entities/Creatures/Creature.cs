@@ -332,7 +332,7 @@ public partial class Creature : CharacterBody3D, IVisible
             return;
         }
 
-        var movementNeurons = _brain.NeuronsMap.FindAll(x => x.Type == BrainZoneType.Movement).OrderBy(x => x.ID).Select(x => x.ID).ToArray();
+        var movementNeurons = _brain.GetNeuronIDsOfType(BrainZoneType.Movement);
         var velocityNeuron = _brain.GetNeuron(movementNeurons[0]);
         var rotationNeuron = _brain.GetNeuron(movementNeurons[1]);
 
@@ -383,12 +383,14 @@ public partial class Creature : CharacterBody3D, IVisible
         {
             _brain.UpdateBrain();
             secondsSinceLastBrainUpdate = 0f;
-            _energyManager.SpendEnergy(
-                _energyManager.CalculateEnergyConsumptionBrainProcessing(
-                    _brain.GetNeuronConnectionsCount(),
-                    _brain.GetNeuronsCount()
-                )
-            );
+
+            // TODO: turn back on when good adoptation algorithm is implemented
+            // _energyManager.SpendEnergy(
+            //     _energyManager.CalculateEnergyConsumptionBrainProcessing(
+            //         _brain.GetNeuronConnectionsCount(),
+            //         _brain.GetNeuronsCount()
+            //     )
+            // );
         }
     }
 
