@@ -93,6 +93,11 @@ public class NeuralNetwork
         }
     }
 
+    /// <summary>
+    /// Cleans up the neural network graph by removing unused neurons and connections.
+    /// Traverses the graph from the output layer neurons backwards to find all connected neurons.
+    /// Any neurons and connections not visited during traversal are removed.
+    /// </summary>
     public void CleanGraph()
     {
         // Step 1: Identify output layer neurons
@@ -117,6 +122,13 @@ public class NeuralNetwork
         });
     }
 
+    /// <summary>
+    /// Traverses the graph of neurons in the neural network using a depth-first search algorithm to traverse the graph.
+    /// It starts from the specified neuron and visits all connected neurons.
+    /// It marks visited neurons in the specified set.
+    /// </summary>
+    /// <param name="neuron"></param>
+    /// <param name="visitedNeurons"></param>
     private void TraverseGraph(Neuron neuron, HashSet<int> visitedNeurons)
     {
         if (!visitedNeurons.Contains(neuron.ID))

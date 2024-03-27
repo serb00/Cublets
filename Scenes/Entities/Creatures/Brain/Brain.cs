@@ -76,6 +76,11 @@ public class Brain
         }
     }
 
+    /// <summary>
+    /// Maps the hidden layer neurons by iterating through each layer's 
+    /// neuron count and adding a new NeuronMapItem for each one.
+    /// Returns the next available neuron index after mapping.
+    /// </summary>
     private int MapHiddenNeurons(int[] hiddenLayers, int idx)
     {
         int layer = 0;

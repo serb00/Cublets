@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Godot;
 
 /// <summary>
@@ -86,4 +85,5 @@ public class Neuron
     {
         IsUsed = false;
     }
+
 }

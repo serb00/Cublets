@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -119,4 +120,53 @@ public static class Utils
         // Remove the last folder by taking all parts except the last
         return string.Join("/", parts.Take(parts.Length - 1));
     }
+
+    public static void SaveCreatureToFile(Creature creature, string filePath)
+    {
+        string creatureJson = EncodeObject<Creature>(creature);
+        // Step 1. Verify if file exists, if not create it
+        if (!System.IO.File.Exists(filePath))
+        {
+            System.IO.File.Create(filePath).Close();
+        }
+        // Step 2. Read a collection from file
+        string json = System.IO.File.ReadAllText(filePath);
+        var collection = DecodeObject<CreatureCollection>(json);
+        // Step 3. Add the creature to the collection
+        collection.Creatures.Add(creature);
+        // Step 4. Save the collection to file
+        System.IO.File.WriteAllText(filePath, EncodeObject<CreatureCollection>(collection));
+    }
+
+    public static List<Creature> LoadCreaturesFromFile(string filePath)
+    {
+        // Step 1. Verify if file exists, if not create it
+        if (!System.IO.File.Exists(filePath))
+        {
+            System.IO.File.Create(filePath).Close();
+        }
+        // Step 2. Read a collection from file
+        string json = System.IO.File.ReadAllText(filePath);
+        var collection = DecodeObject<CreatureCollection>(json);
+        return collection.Creatures;
+    }
+
+    public static void RemoveCreatureFromFile(string filePath, Creature creature)
+    {
+        var creatures = LoadCreaturesFromFile(filePath);
+        creatures.Remove(creature);
+        SaveCreaturesToFile(filePath, creatures);
+    }
+
+    private static void SaveCreaturesToFile(string filePath, List<Creature> creatures)
+    {
+        // Step 1. Serialize a collection to file
+        string json = EncodeObject(new CreatureCollection { Creatures = creatures });
+        System.IO.File.WriteAllText(filePath, json);
+    }
+}
+
+internal class CreatureCollection
+{
+    public List<Creature> Creatures { get; set; } = new List<Creature>();
 }
