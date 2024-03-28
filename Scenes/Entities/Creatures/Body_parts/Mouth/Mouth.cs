@@ -60,7 +60,8 @@ public partial class Mouth : BodyPart
 		var shape = CreateConvexCollisionShapeForMesh(points, _mouthReachArea);
 		shape.Position += position;
 
-		_mouthReachArea.AreaEntered += OnMouthReachAreaEntered;
+		// _mouthReachArea.AreaEntered += OnMouthReachAreaEntered;
+		_mouthReachArea.BodyShapeEntered += OnMouthReachAreaBodyShapeEntered;
 		// _mouthReachArea.AreaExited += OnMouthReachAreaExited;
 
 		AddChild(_mouthReachArea);
@@ -135,9 +136,9 @@ public partial class Mouth : BodyPart
 	/// Handles the event when an Area3D object enters the mouth reach area.
 	/// </summary>
 	/// <param name="area">The entered area.</param>
-	private void OnMouthReachAreaEntered(Area3D area)
+	private void OnMouthReachAreaBodyShapeEntered(Rid bodyRid, Node3D body, long bodyShapeIndex, long localShapeIndex)
 	{
-		if (area is IVisible visible)
+		if (body is IVisible visible)
 		{
 			var data = visible.GetEntityData();
 			if (_mouthData.Diet == DietType.Herbivore)

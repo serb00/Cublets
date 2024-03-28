@@ -361,8 +361,17 @@ public partial class Creature : CharacterBody3D, IVisible
         // Apply the calculated velocity based on the forward direction
         Velocity = forwardDir * MovementSpeed;
 
+        // Put character on floor if it goes below or under the ground
+        if (Position.Y != 0)
+        {
+            var position = Position;
+            position.Y = 0;
+            Position = position;
+        }
+
         // Finally, apply the movement
         MoveAndSlide();
+
 
         // Calculate energy consumption
         float distanceTraveled = Position.DistanceTo(_lastPosition);
@@ -384,13 +393,13 @@ public partial class Creature : CharacterBody3D, IVisible
             _brain.UpdateBrain();
             secondsSinceLastBrainUpdate = 0f;
 
-            // TODO: turn back on when good adoptation algorithm is implemented
-            // _energyManager.SpendEnergy(
-            //     _energyManager.CalculateEnergyConsumptionBrainProcessing(
-            //         _brain.GetNeuronConnectionsCount(),
-            //         _brain.GetNeuronsCount()
-            //     )
-            // );
+            //TODO: turn back off if creatures can't reproduce
+            _energyManager.SpendEnergy(
+                _energyManager.CalculateEnergyConsumptionBrainProcessing(
+                    _brain.GetNeuronConnectionsCount(),
+                    _brain.GetNeuronsCount()
+                )
+            );
         }
     }
 

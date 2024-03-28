@@ -22,13 +22,12 @@ public class EnergyManager
 
     public void AddEnergy(float energy)
     {
-        var previousEnergy = CurrentEnergy;
         CurrentEnergy += energy;
         if (CurrentEnergy > MaxEnergy)
         {
             CurrentEnergy = MaxEnergy;
         }
-        TotalEnergyReplenished += CurrentEnergy - previousEnergy;
+        TotalEnergyReplenished += energy;
     }
 
     public void SpendEnergy(float energy)

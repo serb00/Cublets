@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-public partial class Food : Area3D, IConsumable, IVisible
+public partial class Food : StaticBody3D, IConsumable, IVisible
 {
 	int MinEnergy = 10;
 	int MaxEnergy = 100;
@@ -26,17 +26,6 @@ public partial class Food : Area3D, IConsumable, IVisible
 	public int GetEnergy()
 	{
 		return Energy * CalloriesMultiplier;
-	}
-
-
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
 	}
 
 	public VisibleEntityData GetEntityData()
